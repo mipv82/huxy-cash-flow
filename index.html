@@ -1,0 +1,1486 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Huxy Home Cash Flow</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F2F4F6; --surface:#FFFFFF; --surface-2:#E9EDF0; --line:#D5DBE1; --line-strong:#B9C2CB;
+  --ink:#1A222C; --ink-2:#4D5966; --muted:#7A8592;
+  --accent:#0F6E6A; --accent-ink:#0B5552; --accent-soft:#D9EFEC;
+  --good:#2C7A4B; --warn:#B0731A; --warn-soft:#FBEFD9; --crit:#B4302B; --crit-soft:#F9E1DF;
+  --income:#2C7A4B; --income-soft:#EAF6EE; --income-hover:#D6EEDD; --income-today:#E3EFD2; --income-band:#CFEAD8;
+  --today:#FFF6DB;
+  --sched:#1D5FC2; --sched-soft:#E3ECFA;
+  --shadow:0 10px 30px rgba(20,30,40,.12);
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#11161B; --surface:#181E25; --surface-2:#1F2730; --line:#2C3640; --line-strong:#3B4754;
+    --ink:#E8ECF0; --ink-2:#B4BDC7; --muted:#7F8B98;
+    --accent:#45B5AF; --accent-ink:#8ADAD5; --accent-soft:#173634;
+    --good:#5FC383; --warn:#E0A64C; --warn-soft:#3A2D12; --crit:#EE7168; --crit-soft:#3E1B19;
+    --income:#5FC383; --income-soft:#15261C; --income-hover:#1C3626; --income-today:#243120; --income-band:#1E3A29;
+    --today:#2E2A17;
+    --sched:#7FB0F5; --sched-soft:#172843;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#11161B; --surface:#181E25; --surface-2:#1F2730; --line:#2C3640; --line-strong:#3B4754;
+  --ink:#E8ECF0; --ink-2:#B4BDC7; --muted:#7F8B98;
+  --accent:#45B5AF; --accent-ink:#8ADAD5; --accent-soft:#173634;
+  --good:#5FC383; --warn:#E0A64C; --warn-soft:#3A2D12; --crit:#EE7168; --crit-soft:#3E1B19;
+  --income:#5FC383; --income-soft:#15261C; --income-hover:#1C3626; --income-today:#243120; --income-band:#1E3A29;
+  --today:#2E2A17;
+  --sched:#7FB0F5; --sched-soft:#172843;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;padding-inline:16px;padding-block:18px 60px}
+h1,h2,h3{font-family:"Fraunces","Iowan Old Style",Georgia,serif;font-weight:600;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:26px}
+h2{font-size:18px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.topbar .sub{color:var(--ink-2);margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:500;color:var(--ink)}
+.btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-ink);color:#fff}
+.btn.danger{color:var(--crit);border-color:var(--crit)}
+.btn.small{padding:4px 9px;font-size:12px}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{font-size:12px;color:var(--muted)}
+.status.err{color:var(--crit)}
+.banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:8px;padding:10px 14px;font-size:13px}
+.banner a{color:inherit;font-weight:600}
+.whatifbar{background:var(--sched-soft);color:var(--sched);border-color:var(--sched);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+body.whatif h1::after{content:" · What-if";color:var(--sched)}
+body.whatif .hero{background:var(--sched-soft)}
+body.whatif #btnWhatIf{background:var(--sched);border-color:var(--sched);color:#fff}
+body.whatif .acct .amt input,body.whatif #asOf{opacity:.6}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.balances{display:grid;grid-template-columns:minmax(220px,1.2fr) repeat(auto-fit,minmax(170px,1fr));gap:0;overflow:hidden}
+.balances>div{padding:14px 18px;border-right:1px solid var(--line)}
+.balances>div:last-child{border-right:0}
+.hero{background:var(--accent-soft)}
+.hero .num{font-family:"Fraunces",Georgia,serif;font-size:34px;font-weight:600;color:var(--accent-ink);line-height:1.1;margin-top:4px}
+.hero .asof{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--ink-2)}
+.hero input[type=date]{border:1px solid var(--line-strong);border-radius:6px;padding:3px 6px;background:var(--surface);font-size:12px}
+.acct .name{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.acct .name input{border:0;background:transparent;font-weight:500;width:100%;min-width:0;padding:0}
+.acct .name input:hover{background:var(--surface-2)}
+.acct .amt{display:flex;align-items:baseline;gap:2px;margin-top:4px}
+.acct .amt span{color:var(--muted);font-size:18px}
+.acct .amt input{border:0;border-bottom:1px dashed var(--line-strong);background:transparent;font-size:24px;font-weight:600;width:100%;min-width:0;padding:0 0 2px;font-family:"Fraunces",Georgia,serif}
+.acct .amt input:focus{border-bottom-color:var(--accent);outline:none}
+.acct .amt .savebal{margin-left:8px;flex:none}
+.acct .amt{align-items:center}
+.acct .x{border:0;background:transparent;color:var(--muted);font-size:14px;padding:0 4px;line-height:1}
+.acct .x:hover{color:var(--crit)}
+.acct .cnt{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-top:6px;cursor:pointer}
+.acct.off .amt input{color:var(--muted)}
+.balances .addacct{display:flex;align-items:center;justify-content:center;padding:10px}
+.balances .proj{background:var(--income-soft);border-left:3px dashed var(--good);min-width:210px}
+.proj .num{font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:600;color:var(--good);line-height:1.1;margin-top:4px}
+.proj .sub{font-size:11px;color:var(--ink-2);margin-top:4px}
+.proj .miles{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:6px;font-size:11px;color:var(--good);font-weight:500}
+
+.low{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.alerts{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid transparent}
+.chip.ok{background:var(--income-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.crit{background:var(--crit-soft);color:var(--crit)}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.controls select,.controls input{border:1px solid var(--line-strong);border-radius:6px;padding:4px 6px;background:var(--surface)}
+.controls input[type=number]{width:90px}
+
+.drawer-backdrop{position:fixed;inset:0;background:rgba(10,15,20,.35);z-index:28;display:none}
+.drawer-backdrop.open{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface);box-shadow:var(--shadow);z-index:29;transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.drawer.open{transform:translateX(0)}
+.drawer-top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.drawer .notices{overflow:auto;flex:1}
+.drawer.chat{z-index:31}
+.chatlog{flex:1;overflow:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:92%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+.msg.user{align-self:flex-end;background:var(--accent-soft);color:var(--ink);border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:var(--surface-2);color:var(--ink);border-bottom-left-radius:4px}
+.msg.sys{align-self:stretch;background:transparent;color:var(--muted);font-size:12px;padding:4px 2px}
+.msg.err{align-self:stretch;background:var(--crit-soft);color:var(--crit);font-size:12px}
+.msg.thinking{color:var(--muted);font-style:italic}
+.chatbar{border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.chatbar textarea{width:100%;resize:vertical;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--ink);font-size:14px;min-height:44px}
+.chatbtns{display:flex;gap:6px;justify-content:flex-end}
+.badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;line-height:18px;text-align:center;margin-left:4px}
+.badge.crit{background:var(--crit)}
+.badge.warn{background:var(--warn)}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}}
+.notices{padding:14px 18px}
+.notices .head{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.notices .head label{font-size:12px;color:var(--ink-2)}
+.notices .head input{width:70px;border:1px solid var(--line-strong);border-radius:6px;padding:2px 6px;background:var(--surface)}
+.notice{display:grid;grid-template-columns:1fr auto;grid-template-areas:"when x" "what x" "row row";column-gap:10px;row-gap:3px;align-items:start;text-align:left;padding:12px 14px;border-radius:8px;margin-bottom:8px;border:1px solid var(--line)}
+.notice .when{grid-area:when}.notice .what{grid-area:what;min-width:0}.notice .x{grid-area:x;align-self:start;justify-self:end;margin:-2px -4px 0 0}.notice .nrow{grid-area:row;display:flex;gap:8px;align-items:center;margin-top:6px}
+.notice.ok{display:block}
+.notice.crit{background:var(--crit-soft);border-color:transparent}
+.notice.warn{background:var(--warn-soft);border-color:transparent}
+.notice .when{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--ink-2)}
+.notice .what b{font-family:"Fraunces",Georgia,serif;font-size:17px}
+.drawer{text-align:left}
+.notice .x{border:0;background:transparent;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;cursor:pointer}.notice .x:hover{color:var(--crit)}
+.notice .why{font-size:12px;color:var(--ink-2)}
+.notice.ok{background:var(--income-soft);border-color:transparent;color:var(--good)}
+.acctgrid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.acctpill{font-size:12px;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--ink-2)}
+.acctpill b{color:var(--ink)}
+.acctpill.crit{background:var(--crit-soft);color:var(--crit)}
+.acctpill.warn{background:var(--warn-soft);color:var(--warn)}
+.gridwrap{overflow-x:auto;overflow-y:visible;position:relative}
+table.grid thead th,table.grid tr.cash th,table.grid tr.cash td{will-change:transform}
+table.grid{border-collapse:separate;border-spacing:0;min-width:100%;font-size:13px}
+table.grid th,table.grid td{padding:0;border-bottom:1px solid var(--line);white-space:nowrap}
+table.grid thead th{position:relative;z-index:3;box-shadow:0 1px 0 var(--line-strong);background:var(--surface);text-align:right;padding:8px 10px 6px;font-weight:500;color:var(--ink-2);border-bottom:1px solid var(--line-strong)}
+table.grid thead th.today{background:var(--today);color:var(--ink)}
+table.grid thead th .m{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+table.grid thead th .to{font-weight:400;color:var(--muted);font-size:11px}
+table.grid td.cell .dd{display:block;font-size:10px;color:var(--muted);font-weight:400;line-height:1.1;margin-top:1px}
+table.grid tr.income td.cell .dd{color:var(--good);opacity:.8}
+table.grid th.rowhead{position:sticky;left:0;z-index:2;background:var(--surface);text-align:left;font-weight:500;padding:6px 10px;min-width:220px;border-right:1px solid var(--line-strong)}
+table.grid thead th.rowhead{z-index:4}
+table.grid th.rowhead .meta{display:block;font-size:11px;color:var(--muted);font-weight:400}
+table.grid th.rowhead .note{display:block;font-size:11px;color:var(--accent-ink);font-weight:400;font-style:italic;white-space:normal;max-width:260px}
+table.grid td.cell.noted::before{content:"";display:inline-block;width:0;height:0;border-style:solid;border-width:5px 5px 0 0;border-color:var(--accent) transparent transparent transparent;position:absolute;top:2px;left:2px}
+table.grid td.cell{position:relative}
+table.grid th.rowhead .edit{border:0;background:transparent;color:var(--accent);font-size:12px;padding:0 6px;margin-left:2px;cursor:pointer;opacity:.75}
+table.grid th.rowhead .edit:hover{opacity:1;text-decoration:underline}
+table.grid tbody th.rowhead{cursor:pointer}
+table.grid.daily td.cell{min-width:72px}
+table.grid.monthly td.cell{min-width:110px}
+table.grid td.cell{text-align:right;padding:6px 10px;min-width:82px;cursor:pointer;color:var(--ink)}
+table.grid td.cell:hover{background:var(--surface-2)}
+table.grid td.cell.empty{color:transparent}
+table.grid td.cell.empty:hover{color:var(--muted)}
+table.grid td.cell.paid{color:var(--muted);text-decoration:line-through}
+table.grid td.cell.past{color:var(--ink-2)}
+table.grid th.pastcol,table.grid td.pastcol{background:var(--surface-2)}
+table.grid td.cell.skip{color:var(--muted);opacity:.55}
+table.grid td.cell.sched,table.grid tr.income td.cell.sched{color:var(--sched);font-weight:600}
+table.grid td.cell.sched{border-bottom:2px solid var(--sched)}
+.swatch.sched{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--sched);vertical-align:middle;margin-left:4px}
+table.grid td.cell.override::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-left:4px;vertical-align:middle}
+table.grid td.today{background:var(--today)}
+table.grid tr.section th{background:var(--surface-2);color:var(--ink-2);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:6px 10px;border-right:1px solid var(--line-strong)}
+table.grid tr.section td{background:var(--surface-2)}
+table.grid tr.income th.rowhead,table.grid tr.income td.cell{background:var(--income-soft)}
+table.grid tr.income td.cell{color:var(--income);font-weight:500}
+table.grid tr.income td.cell:hover{background:var(--income-hover)}
+table.grid tr.income td.cell.empty{color:transparent}
+table.grid tr.income td.cell.empty:hover{color:var(--good)}
+table.grid tr.income td.cell.paid{color:var(--muted)}
+table.grid tr.income td.today{background:var(--income-today)}
+table.grid tr.section.inc th,table.grid tr.section.inc td{background:var(--income-band);color:var(--good)}
+table.grid tr.total.inc th,table.grid tr.total.inc td{background:var(--income-soft);color:var(--good)}
+table.grid tr.total th,table.grid tr.total td{font-weight:600;background:var(--surface)}
+table.grid tr.addline th.rowhead{padding:6px 10px;cursor:default}
+table.grid tr.addline th.rowhead .btn{color:var(--accent-ink)}
+table.grid tr.total td{text-align:right;padding:7px 10px}
+table.grid tr.cash th,table.grid tr.cash td{font-weight:600;font-size:14px;border-top:2px solid var(--line-strong);border-bottom:0;background:var(--surface);position:relative;z-index:2}
+table.grid tr.cash th.rowhead{z-index:4}
+table.grid tr.cash td{text-align:right;padding:9px 10px;font-family:"Fraunces",Georgia,serif;font-size:15px}
+table.grid tr.cash td.warn{color:var(--warn);background:var(--warn-soft)}
+table.grid tr.cash td.crit{color:var(--crit);background:var(--crit-soft)}
+table.grid tr.cash td.ok{color:var(--good)}
+table.grid tr.lowrow th,table.grid tr.lowrow td{background:var(--surface);border-top:2px solid var(--line-strong);font-weight:500}
+table.grid tr.lowrow td{text-align:right;padding:6px 10px;font-size:12px}
+table.grid tr.lowrow td .ld{display:block;font-size:10px;color:var(--muted);font-weight:400}
+table.grid tr.lowrow td.warn{color:var(--warn);background:var(--warn-soft)}
+table.grid tr.lowrow td.crit{color:var(--crit);background:var(--crit-soft)}
+table.grid tr.lowrow td.ok{color:var(--ink-2)}
+table.grid thead th.wk{cursor:pointer}
+table.grid thead th .colx{border:0;background:transparent;color:var(--muted);font-size:14px;line-height:1;padding:0 4px;margin-left:4px;cursor:pointer;vertical-align:middle;opacity:.55}
+table.grid thead th .colx:hover{color:var(--crit);opacity:1}
+table.grid thead th.wk:hover{color:var(--accent-ink);text-decoration:underline}
+.addrow{padding:8px 10px}
+
+.chartpanel{padding:16px 18px}
+.chartpanel .head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.chartpanel svg{width:100%;height:auto;display:block}
+.chartpanel .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--ground);padding:6px 9px;border-radius:6px;font-size:12px;transform:translate(-50%,-115%);white-space:nowrap;display:none}
+.chartbox{position:relative}
+
+.analytics{padding:16px 18px}
+.analytics .head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:16px}
+.tile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--ground)}
+.tile .lab{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.tile .val{font-family:"Fraunces",Georgia,serif;font-size:22px;font-weight:600;margin-top:2px;line-height:1.15}
+.tile .sub{font-size:11px;color:var(--ink-2);margin-top:3px}
+.tile.income .val{color:var(--good)}
+.tile.gross .val{color:var(--accent-ink)}
+.analytics table{border-collapse:collapse;width:100%;font-size:13px}
+.analytics th{text-align:left;font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:4px 8px 6px;border-bottom:1px solid var(--line)}
+.analytics th.n,.analytics td.n{text-align:right}
+.analytics td{padding:6px 8px;border-bottom:1px solid var(--line)}
+.analytics td.sub{color:var(--muted);font-size:12px}
+.analytics tfoot td{font-weight:600;border-bottom:0}
+.analytics .tablewrap{overflow-x:auto}
+.loans .tablewrap{overflow-x:auto}
+.analytics .foot{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+.loans{padding:16px 18px}
+.loans table{border-collapse:collapse;width:100%;font-size:13px}
+.loans th{text-align:left;font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:4px 8px 6px;border-bottom:1px solid var(--line)}
+.loans td{padding:5px 8px;border-bottom:1px solid var(--line)}
+.loans td.num{text-align:right}
+.loans input{border:0;border-bottom:1px dashed var(--line-strong);background:transparent;width:100%;min-width:0;padding:2px 0}
+.loans input.num{text-align:right}
+.loans tfoot td{font-weight:600;border-bottom:0}
+.loans .x{border:0;background:transparent;color:var(--muted)}
+.loans .x:hover{color:var(--crit)}
+
+.pop{position:absolute;z-index:20;background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;box-shadow:var(--shadow);padding:12px;width:250px;display:none}
+.pop h3{font-size:14px;margin-bottom:2px}
+.pop .sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+.pop label{display:block;font-size:12px;color:var(--ink-2);margin-bottom:8px}
+.pop input[type=number],.pop input[type=text]{width:100%;border:1px solid var(--line-strong);border-radius:6px;padding:6px 8px;background:var(--surface);margin-top:3px}
+.pop .radios{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.pop .radios label{display:flex;gap:7px;align-items:center;margin:0;font-size:13px;color:var(--ink)}
+.pop .row{display:flex;gap:6px;justify-content:flex-end}
+.pop .moverow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-bottom:10px}
+.pop.wide{width:420px;max-width:calc(100vw - 16px)}
+.daytab{border-collapse:collapse;width:100%;font-size:12px;margin-bottom:10px}
+.daytab th{text-align:left;font-weight:500;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:2px 6px 4px;border-bottom:1px solid var(--line)}
+.daytab td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.daytab td.d{white-space:nowrap;color:var(--ink-2)}
+.daytab td.items span{display:block;white-space:nowrap}
+.daytab td.items .out{color:var(--ink)}
+.daytab td.items .in{color:var(--income)}
+.daytab td.items .none{color:var(--muted)}
+.daytab td.bal{text-align:right;font-weight:600;white-space:nowrap}
+.daytab td.bal.warn{color:var(--warn)}
+.daytab td.bal.crit{color:var(--crit)}
+
+.modal{position:fixed;inset:0;background:rgba(10,15,20,.45);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}
+.modal.open{display:flex}
+.dialog{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);width:min(520px,100%);max-height:92vh;overflow:auto;padding:20px}
+.dialog h2{margin-bottom:12px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}
+.form label.full{grid-column:1/-1}
+.form input,.form select{border:1px solid var(--line-strong);border-radius:6px;padding:7px 8px;background:var(--surface);font-size:14px;color:var(--ink)}
+.form .mysel{display:flex;gap:6px}
+.form .mysel select{flex:1;min-width:0}
+.form .hint{font-size:11px;color:var(--muted)}
+.dialog{display:flex;flex-direction:column;padding-bottom:0}
+.dialog .form{overflow:auto;padding-bottom:8px}
+.dialog .foot{display:flex;justify-content:space-between;gap:8px;margin-top:12px;flex-wrap:wrap;position:sticky;bottom:0;background:var(--surface);padding:10px 0 16px;border-top:1px solid var(--line)}
+.dialog .foot .r{display:flex;gap:8px;margin-left:auto}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40}
+.toast.show{opacity:1}
+.help{font-size:12px;color:var(--muted);line-height:1.5}
+@media (max-width:640px){
+  body{padding-block:12px 40px}
+  .wrap{gap:12px}
+  .balances{grid-template-columns:1fr 1fr}
+  .balances>div{border-bottom:1px solid var(--line);padding:10px 12px}
+  .balances>div:last-child{border-right:0}
+  .hero{grid-column:1/-1}
+  .hero .num{font-size:28px}
+  .acct .amt input{font-size:20px}
+  .form{grid-template-columns:1fr}
+  .dialog{width:100%;max-height:100%;height:100%;border-radius:0;padding:16px}
+  .modal{padding:0;align-items:stretch}
+  table.grid th.rowhead{min-width:128px;max-width:150px;white-space:normal;padding:5px 8px;font-size:12px}
+  table.grid th.rowhead .meta{font-size:10px}
+  table.grid th.rowhead .note{max-width:140px}
+  table.grid td.cell{min-width:66px;padding:5px 7px;font-size:12px}
+  table.grid.daily td.cell{min-width:62px}
+  table.grid thead th{padding:6px 7px 4px;font-size:12px}
+  table.grid tr.cash td{font-size:13px;padding:7px 7px}
+  .low{gap:8px}
+  .controls{gap:6px;font-size:12px}
+  .controls select,.controls input{padding:3px 4px}
+  .controls input[type=number]{width:70px}
+  .chip{font-size:11px;padding:4px 8px}
+  .topbar .sub{display:none}
+  .actions{width:100%;justify-content:flex-start}
+  .btn{padding:6px 10px}
+  .pop{position:fixed;left:8px!important;right:8px;bottom:8px;top:auto!important;width:auto;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+  .pop.wide{width:auto}
+  .drawer{width:100%}
+  .tiles{grid-template-columns:1fr 1fr}
+  .tile .val{font-size:18px}
+  .analytics table{font-size:12px}
+  .analytics td,.analytics th{padding:4px 5px}
+  .chartpanel{padding:12px}
+  h1{font-size:22px}
+  h2{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Weekly cash flow</div>
+      <h1>Huxy Home Cash Flow</h1>
+      <div class="sub">Update your balances, mark what has already come out, and see how far the money reaches.</div>
+    </div>
+    <div class="actions">
+      <span class="status" id="saveStatus">Loading…</span><button class="btn small" id="btnSaveNow" title="Save right now">Save</button>
+      <button class="btn" id="btnAsk" hidden>Ask</button>
+      <button class="btn" id="btnWhatIf" title="Switch between the real cash flow and a what-if copy">What-if: off</button>
+      <button class="btn" id="btnMoney">Move money & payments <span class="badge" id="moneyBadge" hidden></span></button>
+      <button class="btn" id="btnAddIncome">+ Income</button>
+      <button class="btn primary" id="btnAddBill">+ Bill</button>
+    </div>
+  </div>
+
+  <div class="banner whatifbar" id="whatifBar" hidden><b>What-if mode.</b> Balances, the as-of date and payments you cross off on the real cash flow flow in here automatically. Everything else you change here stays in what-if only and never touches the real numbers. <button class="btn small" id="whatifReset">Reset what-if to match the real cash flow</button></div>
+  <div class="panel balances" id="balances"></div>
+
+  <div class="low">
+    <div class="alerts" id="alerts"></div>
+    <div class="controls">
+      <label>View <select id="view"><option value="daily">By day</option><option value="weekly">By week</option><option value="monthly">By month</option></select></label>
+      <label><input type="checkbox" id="showPast"> Show past</label>
+      <label>Through <input type="month" id="through"></label>
+      <label>Warn below $<input type="number" id="floor" step="100"></label>
+      <label>Week starts <select id="weekday"><option value="0">Sun</option><option value="1">Mon</option><option value="5">Fri</option><option value="6">Sat</option></select></label>
+    </div>
+  </div>
+
+  <div class="panel gridwrap" id="gridwrap"></div>
+  <div class="help" id="removedLine" hidden></div>
+
+  <div class="panel chartpanel">
+    <div class="head">
+      <div><h2>Cash left over time</h2><div class="help">Running balance after each day's bills and income. Shaded band is your warning floor.</div></div>
+      <div class="help" id="chartSummary"></div>
+    </div>
+    <div class="chartbox" id="chartbox"></div>
+  </div>
+
+  <div class="panel analytics" id="analytics"></div>
+
+  <div class="panel loans">
+    <div class="topbar" style="margin-bottom:8px"><h2>Loan balances</h2><div class="actions"><span class="help">Updated <input type="date" id="loansDate" style="border:1px solid var(--line-strong);border-radius:6px;padding:2px 6px;background:var(--surface);font-size:12px"></span><button class="btn small" id="btnAddLoan">+ Loan</button></div></div>
+    <div class="tablewrap"><table id="loansTable"></table></div>
+  </div>
+
+  <details class="help" id="logDetails"><summary>Activity log (for troubleshooting)</summary><pre id="logBox" style="white-space:pre-wrap;font-size:11px;max-height:220px;overflow:auto;background:var(--surface);padding:8px;border-radius:6px;border:1px solid var(--line)"></pre></details>
+  <p class="help" id="footHelp">Click any amount in the grid to change it for that week, mark it as already out of your account, or skip it. Each column is a day on which something comes in or goes out; days with nothing are hidden. Blue amounts are payments you have scheduled but that have not left the account yet; they still count. A payment dated on or before the "as of" date stays on the page, still counted, until you cross it off (click it and choose "Already paid"); click the day's header to cross off the whole day. A small dot marks a week you edited by hand.</p>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer" aria-label="Move money"><div class="drawer-top"><h2>Move money</h2><button class="btn small" id="drawerClose">Close</button></div><div class="notices" id="notices"></div></aside>
+<aside class="drawer chat" id="chatDrawer" aria-label="Ask about your cash flow"><div class="drawer-top"><div><h2>Ask</h2><div class="help">Questions about your cash flow, answered from what is on this page.</div></div><button class="btn small" id="chatClose">Close</button></div>
+  <div class="chatlog" id="chatLog"><div class="msg sys">Ask anything about your balances, upcoming bills, income, or what to move where. I can see everything on this page as of right now. Uses your Claude account; the first question asks for permission.</div></div>
+  <form class="chatbar" id="chatForm"><textarea id="chatInput" rows="2" placeholder="e.g. Can I afford to pay off BestEgg in November?"></textarea><div class="chatbtns"><button type="button" class="btn small" id="chatStop" hidden>Stop</button><button type="button" class="btn small" id="chatClear">Clear</button><button type="submit" class="btn small primary" id="chatSend">Ask</button></div></form></aside>
+<div class="pop" id="pop"></div>
+<div class="modal" id="modal"><div class="dialog" id="dialog"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const APP_VERSION="69";
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const YEARS=[2026,2027,2028,2029,2030,2031];
+const SEED = {
+  seeded:true,
+  version:27,
+  updatedAt:0,
+  asOf:"2026-09-16",
+  historyStart:"2026-09-16",
+  settings:{weeks:26,through:"2028-12",floor:1500,weekday:5,view:"daily",uplift:32,cushion:250,confirmFrom:"2026-09-16"},
+  accounts:[
+    {id:"a1",name:"Checking ...6035",balance:5188},
+    {id:"a2",name:"Checking ...4747",balance:364},
+    {id:"a3",name:"Checking ...2146",balance:2979},
+    {id:"a4",name:"Savings",balance:0,exclude:true}
+  ],
+  items:[
+    {id:"b1",kind:"bill",name:"Mortgage - 1st",amount:3700,account:"6035",sched:{type:"monthly",day:1}},
+    {id:"b2",kind:"bill",name:"Second Mortgage",amount:732,account:"2146",sched:{type:"monthly",day:19}},
+    {id:"b3",kind:"bill",name:"Life Insurance",amount:75,account:"2146",sched:{type:"monthly",day:12}},
+    {id:"b4",kind:"bill",name:"Life Insurance (2)",amount:64,account:"6035",sched:{type:"monthly",day:26}},
+    {id:"b5",kind:"bill",name:"Cell",amount:165,account:"2146",sched:{type:"monthly",day:5}},
+    {id:"b6",kind:"bill",name:"Car",amount:807,account:"6035",sched:{type:"monthly",day:16}},
+    {id:"b7",kind:"bill",name:"Trash",amount:50,account:"2146",sched:{type:"monthly",day:26}},
+    {id:"b8",kind:"bill",name:"Papa",amount:200,account:"2146",sched:{type:"monthly",day:30}},
+    {id:"b9",kind:"bill",name:"Crossfit",amount:750,account:"2146",sched:{type:"once",date:"2027-06-25"}},
+    {id:"b9b",kind:"bill",name:"Crossfit",amount:750,account:"2146",sched:{type:"once",date:"2027-07-30"}},
+    {id:"b10",kind:"bill",name:"Loan Consolidation",amount:790,account:"2146",sched:{type:"twice",day:15,day2:30}},
+    {id:"b11",kind:"bill",name:"Amex Loan",amount:374,account:"6035",sched:{type:"monthly",day:17}},
+    {id:"b12",kind:"bill",name:"Amex Loan payoff",amount:5000,account:"6035",sched:{type:"once",date:"2027-01-22"}},
+    {id:"b13",kind:"bill",name:"BestEgg",amount:350,account:"6035",sched:{type:"monthly",day:13}},
+    {id:"b14",kind:"bill",name:"BestEgg payoff",amount:3000,account:"6035",sched:{type:"once",date:"2026-12-18"}},
+    {id:"b15",kind:"bill",name:"Chase",amount:695,account:"6035",sched:{type:"once",date:"2026-10-11"}},
+    {id:"b16",kind:"bill",name:"Amex Platinum",amount:3750,account:"6035",sched:{type:"monthly",day:6}},
+    {id:"b17",kind:"bill",name:"Apple Card",amount:2000,account:"6035",sched:{type:"monthly",day:20}},
+    {id:"b18",kind:"bill",name:"401K Contribution",amount:1000,account:"",sched:{type:"monthly",day:20},start:"2027-01"},
+    {id:"b19",kind:"bill",name:"Transfer back to Savings",amount:4575,account:"",sched:{type:"monthly",day:20},start:"2027-02",savings:true},
+    {id:"b20",kind:"bill",name:"Transfer to Savings",amount:500,account:"",sched:{type:"once",date:"2026-10-09"},savings:true},
+    {id:"i1",kind:"income",name:"Square Edge",amount:1750,account:"4747",sched:{type:"monthly",day:10}},
+    {id:"i2",kind:"income",name:"BRKC",amount:775,account:"4747",sched:{type:"monthly",day:9}},
+    {id:"i3",kind:"income",name:"Gayla",amount:300,account:"2146",sched:{type:"monthly",day:10}},
+    {id:"i4",kind:"income",name:"KLA Clients",amount:5000,account:"4747",sched:{type:"twice",day:15,day2:30}},
+    {id:"i5",kind:"income",name:"Andrew",amount:2268,account:"2146",sched:{type:"twicefri",day:15,day2:30,weekday:5,mode:"nearest"},gross:100000}
+  ],
+  overrides:{
+    "b2__2026-09-18":{amount:366,status:"due"},
+    "b17__2026-09-18":{amount:2306,status:"due"}
+  },
+  loans:[
+    {id:"l1",name:"Amex Loan (27th, $374)",rate:8.98,balance:5939},
+    {id:"l2",name:"BestEgg (13th, $350)",rate:13.91,balance:4543},
+    {id:"l3",name:"Loan Consolidation",rate:0,balance:62624}
+  ],
+  loansDate:"2026-05-11"
+};
+
+let state = JSON.parse(JSON.stringify(SEED));
+const LOG=[]; function log(m){ const t=new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",second:"2-digit"}); LOG.push(t+"  "+m); if(LOG.length>60) LOG.shift(); const el=document.getElementById("logBox"); if(el){ el.textContent=LOG.slice().reverse().join("\n"); } }
+let db = null, docRef = null, applyingRemote = false, saveTimer = null, unsub = null;
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2,9);
+
+function pad(n){return String(n).padStart(2,"0")}
+function toISO(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function fromISO(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function daysInMonth(y,m){return new Date(y,m+1,0).getDate()}
+function ym(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)}
+function fmt(n){const neg=n<0;const s="$"+Math.round(Math.abs(n)).toLocaleString("en-US");return neg?"-"+s:s}
+function fmtDate(d){return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}
+function fmtShort(d){return d.toLocaleDateString("en-US",{month:"short",day:"numeric"})}
+function todayISO(){return toISO(new Date())}
+
+function futureStart(){
+  const asOf = fromISO(state.asOf);
+  const wd = Number(state.settings.weekday);
+  let start = new Date(asOf);
+  while(start.getDay()!==wd) start = addDays(start,1);
+  return start;
+}
+function historyStartWeek(){
+  const h=fromISO(state.historyStart||state.asOf); const f=futureStart();
+  let w=weekStartOf(h); if(w>f) w=f; return w;
+}
+function weekStarts(){
+  const f=futureStart(); const h=historyStartWeek();
+  const out=[]; const thr=(state.settings.through||"2028-12").split("-").map(Number); const endM=new Date(thr[0],thr[1],0);
+  const end=endM>addDays(f,7*4)?addDays(endM,1):addDays(f,7*Number(state.settings.weeks||26));
+  for(let w=new Date(h); w<end; w=addDays(w,7)) out.push(new Date(w));
+  return out;
+}
+function isPastWeek(w){ return w<futureStart(); }
+
+function inRange(item,d){
+  const k=ym(d);
+  if(item.start && k<item.start) return false;
+  if(item.end && k>item.end) return false;
+  return true;
+}
+function weekStartOf(d){const wd=Number(state.settings.weekday); let x=new Date(d); while(x.getDay()!==wd) x=addDays(x,-1); return x;}
+function placeWeek(d,mode){
+  const prev=weekStartOf(d); if(mode==="contain") return prev;
+  if(prev.getTime()===d.getTime()) return prev;
+  const next=addDays(prev,7);
+  if(mode==="after") return next;
+  const dp=Math.round((d-prev)/864e5), dn=Math.round((next-d)/864e5);
+  return dn<=dp?next:prev;
+}
+function occurrences(item,wStart){
+  const mode=item.place||"contain";
+  const first=futureStart(); const asOfNext=addDays(fromISO(state.asOf),1);
+  const past=wStart<first;
+  const base=Object.assign({},item,{after:false,place:"contain"});
+  const raw=[].concat(occurrencesRaw(base,addDays(wStart,-7)),occurrencesRaw(base,wStart),occurrencesRaw(base,addDays(wStart,7)));
+  const out=[];
+  for(const d of raw){
+    if(past){ if(d>=asOfNext) continue; } else { if(d<asOfNext) continue; }
+    let t=placeWeek(d,mode); if(!past&&first&&t<first) t=first;
+    if(t.getTime()!==wStart.getTime()) continue;
+    if(out.some(o=>(o.pay||o).getTime()===d.getTime())) continue;
+    if(weekStartOf(d).getTime()===t.getTime()) out.push(d); else { const x=new Date(t); x.pay=d; out.push(x); }
+  }
+  out.sort((a,b)=>(a.pay||a)-(b.pay||b));
+  return out;
+}
+// The weekday (0=Sun..6=Sat) nearest the given day of month. mode: "nearest" (default), "before" (on or before), "after" (on or after).
+function weekdayNear(y,m,day,wd,mode){
+  const t=new Date(y,m,Math.min(Number(day)||1,daysInMonth(y,m)));
+  const back=(t.getDay()-wd+7)%7, fwd=(wd-t.getDay()+7)%7;
+  if(mode==="before") return addDays(t,-back);
+  if(mode==="after") return addDays(t,fwd);
+  return fwd<back?addDays(t,fwd):addDays(t,-back);
+}
+function occurrencesRaw(item,wStart){
+  const wEnd = addDays(wStart,6);
+  const first=futureStart(); const asOfNext=addDays(fromISO(state.asOf),1);
+  if(first && wStart.getTime()===first.getTime() && asOfNext<wStart) wStart=asOfNext;
+  const s = item.sched||{type:"monthly",day:1};
+  const out=[];
+  const pushDay=(y,m,day)=>{const d=new Date(y,m,Math.min(day,daysInMonth(y,m)));if(d>=wStart&&d<=wEnd&&inRange(item,d))out.push(d)};
+  if(s.type==="monthly"||s.type==="twice"){
+    const months=[[wStart.getFullYear(),wStart.getMonth()]];
+    if(wEnd.getMonth()!==wStart.getMonth()||wEnd.getFullYear()!==wStart.getFullYear()) months.push([wEnd.getFullYear(),wEnd.getMonth()]);
+    for(const [y,m] of months){pushDay(y,m,Number(s.day)||1); if(s.type==="twice") pushDay(y,m,Number(s.day2)||15);}
+  } else if(s.type==="twicefri"){
+    // Twice a month, each occurrence moved to a weekday (default Friday) nearest / on-or-before / on-or-after the target day.
+    const seen=new Set();
+    for(let k=-1;k<=1;k++){
+      const ym=new Date(wStart.getFullYear(),wStart.getMonth()+k,1);
+      for(const day of [Number(s.day)||15,Number(s.day2)||30]){
+        const d=weekdayNear(ym.getFullYear(),ym.getMonth(),day,Number(s.weekday??5),s.mode||"nearest");
+        if(d>=wStart&&d<=wEnd&&inRange(item,d)&&!seen.has(d.getTime())){seen.add(d.getTime());out.push(d);}
+      }
+    }
+    out.sort((a,b)=>a-b);
+  } else if(s.type==="weekly"){
+    for(let d=new Date(wStart);d<=wEnd;d=addDays(d,1)){ if(d.getDay()===Number(s.weekday??5)&&inRange(item,d)){out.push(d);break;}}
+  } else if(s.type==="biweekly"||s.type==="everyn"){
+    const anchor=fromISO(s.date||state.asOf); const n=(s.type==="biweekly"?2:Number(s.n)||2)*7;
+    for(let d=new Date(wStart);d<=wEnd;d=addDays(d,1)){const diff=Math.round((d-anchor)/864e5);if(diff>=0&&diff%n===0&&inRange(item,d)){out.push(d);break;}}
+  } else if(s.type==="once"){
+    const d=fromISO(s.date||state.asOf); if(d>=wStart&&d<=wEnd) out.push(d);
+  }
+  return out;
+}
+
+function cellInfo(item,wStart){
+  const key=item.id+"__"+toISO(wStart);
+  const asOf=fromISO(state.asOf);
+  const cf=state.settings.confirmFrom||state.asOf;
+  const auto=occ=>(occ.length&&occ.every(d=>{const x=d.pay||d;return x<asOf&&toISO(x)<=cf}))?"paid":"due";
+  const parts=[];
+  let ov=state.overrides[key]||null; let useKey=key;
+  const hidden=!!(ov&&(ov.shift||ov.moveTo||ov.deleted));
+  const wISO=toISO(wStart);
+  let own=hidden?[]:occurrences(item,wStart);
+  if(own.length){
+    const natOf=d=>toISO(weekStartOf(d.pay||d));
+    own=own.filter(d=>{ const n=natOf(d); if(n===wISO) return true; const po=state.overrides[item.id+"__"+n]; return !(po&&(po.shift||po.moveTo||po.deleted)); });
+    if(!ov){ const n=own.map(natOf).find(n=>n!==wISO); if(n){ const pk=item.id+"__"+n; const po=state.overrides[pk]; if(po&&po.amount!=null&&!po.shift&&!po.moveTo&&!po.deleted){ ov=po; useKey=pk; } } }
+  }
+  let orphanOk=true;
+  if(!own.length&&ov&&ov.amount!=null&&!hidden&&isPastWeek(wStart)){ const raw=occurrencesRaw(Object.assign({},item,{place:"contain"}),wStart); if(raw.some(d=>d>asOf)) orphanOk=false; }
+  const autoEmpty=()=>(wStart<asOf&&wISO<=cf)?"paid":"due";
+  if(own.length||(ov&&ov.amount!=null&&!hidden&&orphanOk)){
+    let st0=(ov&&ov.status&&ov.status!=="due")?ov.status:(own.length?auto(own):autoEmpty()); const sch0=st0==="scheduled"; if(sch0) st0="due";
+    const orphanOcc=(!own.length&&ov&&ov.date)?[fromISO(ov.date)]:own;
+    parts.push({occ:orphanOcc,amount:(ov&&ov.amount!=null)?Number(ov.amount):own.length*Number(item.amount||0),status:st0,sched:sch0,ov,key:useKey,moved:0});
+  }
+  const wEnd=addDays(wStart,6); const pre=item.id+"__";
+  for(const k of Object.keys(state.overrides)){
+    if(!k.startsWith(pre)) continue; const o=state.overrides[k]; if(!o||!o.moveTo||o.deleted) continue;
+    const td=fromISO(o.moveTo); if(td<wStart||td>wEnd) continue;
+    const src=fromISO(k.slice(pre.length)); const so=occurrences(item,src); if(!so.length&&o.amount==null) continue;
+    const x=new Date(td); x.pay=td; x.from=so.length?(so[0].pay||so[0]):src;
+    parts.push({occ:[x],amount:(o.amount!=null)?Number(o.amount):so.length*Number(item.amount||0),status:(o.status&&o.status!=="due"&&o.status!=="scheduled")?o.status:((td<asOf&&toISO(td)<=cf)?"paid":"due"),sched:o.status==="scheduled",ov:o,key:k,moved:2});
+  }
+  for(const dir of [1,-1]){
+    const src=addDays(wStart,-7*dir); const skey=item.id+"__"+toISO(src); const sov=state.overrides[skey];
+    if(sov&&sov.shift===dir){
+      const so=occurrences(item,src);
+      if(so.length){
+        const occ=so.map(d=>{const x=new Date(wStart); x.pay=d.pay||d; x.moved=dir; return x;});
+        parts.push({occ,amount:(sov.amount!=null)?Number(sov.amount):so.length*Number(item.amount||0),status:sov.status==="scheduled"?"due":(sov.status||auto(so)),sched:sov.status==="scheduled",ov:sov,key:skey,moved:dir});
+      }
+    }
+  }
+  if(!parts.length) return null;
+  const due=parts.filter(p=>p.status==="due");
+  const dueAmt=due.reduce((a,p)=>a+p.amount,0);
+  const all=parts.reduce((a,p)=>a+p.amount,0);
+  const status=due.length?"due":(parts.every(p=>p.status==="paid")?"paid":"skip");
+  const pastWk=isPastWeek(wStart);
+  const happened=parts.filter(p=>p.status!=="skip"); const happenedAmt=happened.reduce((a,p)=>a+p.amount,0);
+  const paidAmt=parts.filter(p=>p.status==="paid").reduce((a,p)=>a+p.amount,0);
+  return {key,parts,amount:pastWk?(happened.length?happenedAmt:all):(due.length?dueAmt:all),status,occ:parts.flatMap(p=>p.occ),override:parts.some(p=>p.ov),moved:parts.some(p=>p.moved),counts:pastWk?happened.length>0:due.length>0,past:pastWk,pending:pastWk?dueAmt:0,paidAmt,sched:parts.some(p=>p.sched&&p.status==="due")};
+}
+
+function compute(){
+  const weeks=weekStarts();
+  const bills=state.items.filter(i=>i.kind==="bill");
+  const income=state.items.filter(i=>i.kind==="income");
+  const start=state.accounts.filter(a=>!a.exclude).reduce((a,c)=>a+Number(c.balance||0),0);
+  const rows=weeks.map(w=>{
+    let exp=0,inc=0,pexp=0,pinc=0;
+    const past=isPastWeek(w);
+    for(const b of bills){const c=cellInfo(b,w);if(!c)continue; if(past){exp+=c.paidAmt+c.pending;pexp+=c.pending;} else if(c.counts)exp+=c.amount}
+    for(const i of income){const c=cellInfo(i,w);if(!c)continue; if(past){inc+=c.paidAmt+c.pending;pinc+=c.pending;} else if(c.counts)inc+=c.amount}
+    return {w,exp,inc,pexp,pinc,cash:0,past};
+  });
+  const fi=rows.findIndex(r=>!r.past);
+  const pending=rows.filter(r=>r.past).reduce((a,r)=>a+r.pexp-r.pinc,0);
+  let running=start-pending;
+  for(let i=Math.max(fi,0);i<rows.length;i++){ running=running-rows[i].exp+rows[i].inc; rows[i].cash=running; }
+  let back=start-pending;
+  for(let i=fi-1;i>=0;i--){ rows[i].cash=back; back=back+rows[i].exp-rows[i].inc; }
+  let bal=start-pending;
+  rows.forEach(r=>{
+    if(r.past){ r.days=[]; r.low=r.cash; r.lowDay=null; return; }
+    const days=[]; for(let i=0;i<7;i++) days.push({d:addDays(r.w,i),bills:[],inc:[]});
+    const put=(it,ci)=>{ const per=ci.amount/(ci.occ.length||1); ci.occ.forEach(d=>{ let idx=Math.round((d-r.w)/864e5); if(idx<0) idx=0; if(idx>6) idx=6; (it.kind==="bill"?days[idx].bills:days[idx].inc).push({name:it.name,amt:per}); }); };
+    for(const b of bills){const ci=cellInfo(b,r.w); if(ci&&ci.counts&&ci.occ.length) put(b,ci); else if(ci&&ci.counts) days[0].bills.push({name:b.name,amt:ci.amount});}
+    for(const i of income){const ci=cellInfo(i,r.w); if(ci&&ci.counts&&ci.occ.length) put(i,ci); else if(ci&&ci.counts) days[0].inc.push({name:i.name,amt:ci.amount});}
+    let low=Infinity, lowDay=null;
+    days.forEach(dy=>{ dy.open=bal; dy.bills.forEach(x=>bal-=x.amt); dy.afterBills=bal; if(bal<low){low=bal;lowDay=dy.d;} dy.inc.forEach(x=>bal+=x.amt); dy.close=bal; });
+    r.days=days; r.low=low; r.lowDay=lowDay;
+  });
+  return {weeks,bills,income,start,rows,pending};
+}
+
+function cashClass(v){const f=Number(state.settings.floor||0);return v<0?"crit":v<f?"warn":"ok"}
+
+function projectedSavingsTile(){
+  const items=state.items.filter(i=>i.kind==="bill"&&i.savings);
+  if(!items.length) return "";
+  const c=compute(); const asOf=fromISO(state.asOf);
+  const ev=[];
+  for(const it of items) for(const w of c.weeks){ if(isPastWeek(w)) continue; const ci=cellInfo(it,w); if(!ci) continue; for(const part of ci.parts){ if(part.status!=="due") continue; if(part.occ.length){ const per=part.amount/part.occ.length; for(const d of part.occ) ev.push({d:d.pay||d,amt:per}); } else ev.push({d:w,amt:part.amount}); } }
+  ev.sort((a,b)=>a.d-b.d);
+  const total=ev.reduce((a,e)=>a+e.amt,0);
+  const first=ev[0]; const last=ev[ev.length-1];
+  const years={}; let run=0; for(const e of ev){ run+=e.amt; years[e.d.getFullYear()]=run; }
+  const ys=Object.keys(years).sort();
+  const monthly=items.filter(i=>i.sched&&i.sched.type!=="once").reduce((a,i)=>a+monthlyOf(i),0);
+  const startTxt=first?fmtDate(first.d):"not scheduled";
+  return `<div class="proj"><div class="eyebrow">Projected savings</div><div class="num">${fmt(total)}</div><div class="sub">by ${last?fmtShort(last.d)+", "+last.d.getFullYear():"end of horizon"} · starts ${startTxt}${monthly?" · "+fmt(monthly)+" per month":""}</div><div class="miles">${ys.map(y=>`<span>${fmt(years[y])} by end of ${y}</span>`).join("")}</div></div>`;
+}
+function renderBalances(){
+  const el=$("#balances");
+  const total=state.accounts.filter(a=>!a.exclude).reduce((a,c)=>a+Number(c.balance||0),0);
+  const excluded=state.accounts.filter(a=>a.exclude).reduce((a,c)=>a+Number(c.balance||0),0);
+  const cc=compute(); const pend=cc.pending||0; const pexp=cc.rows.filter(r=>r.past).reduce((a,r)=>a+(r.pexp||0),0), pinc=cc.rows.filter(r=>r.past).reduce((a,r)=>a+(r.pinc||0),0);
+  let h=`<div class="hero"><div class="eyebrow">Cash on hand</div><div class="num">${fmt(total)}</div>${(pexp||pinc)?`<div class="help" style="color:var(--warn)">Not crossed off yet: ${pexp?fmt(pexp)+" in bills":""}${pexp&&pinc?", ":""}${pinc?fmt(pinc)+" in income":""} · ${fmt(total-pend)} after they clear</div>`:""}${excluded?`<div class="help">plus ${fmt(excluded)} set aside, not counted</div>`:""}<div class="asof">as of <input type="date" id="asOf" value="${state.asOf}"></div></div>`;
+  for(const a of state.accounts){
+    h+=`<div class="acct${a.exclude?" off":""}" data-id="${a.id}"><div class="name"><input value="${esc(a.name)}" data-f="name" aria-label="Account name"><button class="x" title="Remove account" data-del="${a.id}">×</button></div><div class="amt"><span>$</span><input type="number" step="1" value="${a.balance}" data-f="balance" aria-label="Balance" id="bal_${a.id}"><button class="btn small primary savebal" data-save="${a.id}" title="Save this balance">Save</button></div><label class="cnt"><input type="checkbox" data-f="exclude" ${a.exclude?"":"checked"}> counts toward cash</label></div>`;
+  }
+  h+=projectedSavingsTile();
+  h+=`<div class="addacct"><button class="btn small" id="addAcct">+ Account</button></div>`;
+  el.innerHTML=h;
+  if(MODE==="whatif"){ el.querySelectorAll(".acct input, #asOf, [data-save], [data-del], #addAcct").forEach(x=>{ x.disabled=true; x.title="Set on the real cash flow; what-if follows it"; }); }
+  el.querySelectorAll(".acct input").forEach(inp=>{
+    const apply=()=>{
+      const id=inp.closest(".acct").dataset.id;const a=state.accounts.find(x=>x.id===id);
+      if(!a){ log("balance edit: account not found for id "+id); return; }
+      if(inp.dataset.f==="balance"){ a.balance=Number(inp.value||0); log("balance "+a.name+" -> "+a.balance+" (typed \""+inp.value+"\")"); } else if(inp.dataset.f==="exclude") a.exclude=!inp.checked; else a.name=inp.value;
+      touch("account edit");
+    };
+    inp.addEventListener("input",()=>{apply(); const tot=state.accounts.filter(a=>!a.exclude).reduce((x,a)=>x+Number(a.balance||0),0); const n=el.querySelector(".hero .num"); if(n) n.textContent=fmt(tot);});
+    inp.addEventListener("change",()=>{apply();renderAll();});
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")inp.blur()});
+  });
+  el.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",()=>{
+    const id=b.dataset.save; const a=state.accounts.find(x=>x.id===id); const inp=el.querySelector("#bal_"+id); if(!a||!inp) return;
+    const raw=String(inp.value).replace(/[^0-9.-]/g,""); const v=Number(raw); if(raw===""||isNaN(v)){ toast("Enter a number for "+a.name); inp.focus(); return; }
+    a.balance=v; log("balance saved by button: "+a.name+" -> "+v); touch("balance button"); renderAll(); persist(); toast(a.name+" set to "+fmt(v));
+  }));
+  el.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{
+    if(state.accounts.length<=1) return;
+    state.accounts=state.accounts.filter(a=>a.id!==b.dataset.del); touch(); renderAll();
+  }));
+  $("#addAcct").addEventListener("click",()=>{state.accounts.push({id:uid(),name:"New account",balance:0});touch();renderAll();});
+  $("#asOf").addEventListener("change",e=>{state.asOf=e.target.value||todayISO();touch();renderAll();});
+}
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function schedLabel(it){
+  const s=it.sched||{};
+  const ord=n=>{n=Number(n);const t=n%10,h=n%100;return n+((h>=11&&h<=13)?"th":t===1?"st":t===2?"nd":t===3?"rd":"th")};
+  let l="";
+  if(s.type==="monthly") l="monthly, "+ord(s.day);
+  else if(s.type==="twice") l=ord(s.day)+" & "+ord(s.day2);
+  else if(s.type==="twicefri"){ const wn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][Number(s.weekday??5)]; const md=s.mode==="before"?" on or before":s.mode==="after"?" on or after":" nearest"; l=wn+md+" the "+ord(s.day)+" & "+ord(s.day2); }
+  else if(s.type==="weekly") l="weekly";
+  else if(s.type==="biweekly") l="every 2 weeks";
+  else if(s.type==="everyn") l="every "+(s.n||2)+" weeks";
+  else if(s.type==="once") l="once, "+fmtDate(fromISO(s.date));
+  else if(s.type==="none") l="as needed: click a cell to add an amount";
+
+  if(it.start) l+=" · from "+it.start;
+  if(it.end) l+=" · until "+it.end;
+  const ac=findAccount(it.account); if(ac) l+=" · "+ac.name;
+  return l;
+}
+
+function renderGrid(){
+  const c0=compute();
+  const showPast=!!state.settings.showPast;
+  const hasAny=w=>state.items.some(it=>cellInfo(it,w));
+  const keep=r=>hasAny(r.w)&&(showPast||!r.past||(r.pexp||0)>0||(r.pinc||0)>0);
+  const c=Object.assign({},c0,{weeks:c0.rows.filter(keep).map(r=>r.w),rows:c0.rows.filter(keep)});
+  const vw=state.settings.view||"daily"; if(vw==="daily"||vw==="monthly"){ renderDaily(c,vw==="monthly"); return; }
+  const today=fromISO(state.asOf);
+  const isToday=w=>today>=w&&today<=addDays(w,6);
+  let h=`<table class="grid"><thead><tr><th class="rowhead">Week of</th>`;
+  for(const w of c.weeks){h+=`<th class="wk ${isToday(w)?"today":""}${isPastWeek(w)?" pastcol":""}" data-week="${toISO(w)}" title="Click for the day-by-day breakdown"><span class="m">${w.getFullYear()}</span>${fmtShort(w)}<button class="colx" data-markweek="${toISO(w)}" title="Remove this week: every payment and deposit in it is taken out">×</button></th>`}
+  h+=`</tr></thead><tbody>`;
+  const rowFor=(it)=>{
+    let r=`<tr class="${it.kind}"><th class="rowhead">${esc(it.name)}<button class="edit" data-edit="${it.id}" aria-label="Edit ${esc(it.name)}">&#9998; edit</button><span class="meta">${fmt(it.amount)} · ${schedLabel(it)}</span>${it.note?`<span class="note">${esc(it.note)}</span>`:""}</th>`;
+    for(const w of c.weeks){
+      const ci=cellInfo(it,w);
+      const cls=["cell",isToday(w)?"today":""];
+      if(!ci){cls.push("empty");r+=`<td class="${cls.join(" ")}" data-item="${it.id}" data-week="${toISO(w)}">+</td>`;continue;}
+      cls.push(ci.status); if(ci.sched) cls.push("sched"); if(ci.override) cls.push("override"); const ov=state.overrides[ci.key]; if(ov&&ov.note) cls.push("noted");
+      const tt=(ci.status==="paid"?"Already out of your account":ci.status==="skip"?"Skipped this week":"Due "+ci.occ.map(d=>d.pay?fmtDate(d.pay)+(d.moved?" (moved to this week)":" (lands "+fmtDate(d)+")"):fmtDate(d)).join(", "))+(ov&&ov.note?" · "+ov.note:"")+(it.note?" · "+it.note:"");
+      r+=`<td class="${cls.join(" ")}" data-item="${it.id}" data-week="${toISO(w)}" title="${esc(tt)}">${fmt(ci.amount)}<span class="dd">${ci.occ.length?ci.occ.map(d=>fmtShort(d.pay||d)+(d.moved?(d.moved>0?" \u2192":" \u2190"):"")).join(", "):""}</span></td>`;
+    }
+    return r+`</tr>`;
+  };
+  h+=`<tr class="section"><th class="rowhead">Bills</th><td colspan="${c.weeks.length}"></td></tr>`;
+  for(const b of c.bills) h+=rowFor(b);
+  h+=`<tr class="addline"><th class="rowhead"><button class="btn small" data-add="bill">+ Add a bill</button></th><td colspan="${c.weeks.length}"></td></tr>`;
+  h+=`<tr class="total"><th class="rowhead">Total expenses</th>`;
+  for(const r of c.rows) h+=`<td class="${isToday(r.w)?"today":""}">${fmt(r.exp)}</td>`;
+  h+=`</tr><tr class="section inc"><th class="rowhead">Income</th><td colspan="${c.weeks.length}"></td></tr>`;
+  for(const i of c.income) h+=rowFor(i);
+  h+=`<tr class="addline"><th class="rowhead"><button class="btn small" data-add="income">+ Add income</button></th><td colspan="${c.weeks.length}"></td></tr>`;
+  h+=`<tr class="total inc"><th class="rowhead">Total income</th>`;
+  for(const r of c.rows) h+=`<td class="${isToday(r.w)?"today":""}">${fmt(r.inc)}</td>`;
+  h+=`</tr><tr class="lowrow"><th class="rowhead">Lowest day in week<span class="meta">balance after that day's bills, before its income</span></th>`;
+  for(const r of c.rows) h+=`<td class="${cashClass(r.low)}${isToday(r.w)?" today":""}" title="${r.lowDay?fmtDate(r.lowDay):""}">${fmt(r.low)}<span class="ld">${r.lowDay?fmtShort(r.lowDay):""}</span></td>`;
+  h+=`</tr><tr class="cash"><th class="rowhead">Cash left</th>`;
+  for(const r of c.rows) h+=`<td class="${cashClass(r.cash)}${isToday(r.w)?" today":""}">${fmt(r.cash)}</td>`;
+  h+=`</tr></tbody></table>`;
+  $("#gridwrap").innerHTML=h; pinRows();
+  $("#gridwrap").querySelectorAll("td.cell").forEach(td=>td.addEventListener("click",e=>openPop(td)));
+  $("#gridwrap").querySelectorAll("thead th.wk").forEach(th=>th.addEventListener("click",e=>{ if(e.target.closest(".colx")) return; openDays(th,c); }));
+  $("#gridwrap").querySelectorAll("[data-markweek]").forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); const w=fromISO(b.dataset.markweek); let n=0; const removedNow=[]; for(const it of state.items){ const ci=cellInfo(it,w); if(!ci) continue; for(const part of ci.parts){ const o=state.overrides[part.key]||{}; if(o.amount==null) o.amount=part.amount; o.status="skip"; o.deleted=true; state.overrides[part.key]=o; removedNow.push(part.key); n++; } } state.settings.lastRemoved=removedNow; log("removed week "+b.dataset.markweek+" ("+n+")"); touch("remove week"); renderAll(); toast(`${n} payment${n===1?"":"s"} in the week of ${fmtShort(w)} removed`); }));
+  $("#gridwrap").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();openItemForm(state.items.find(i=>i.id===b.dataset.edit))}));
+  $("#gridwrap").querySelectorAll("tbody th.rowhead").forEach(th=>th.addEventListener("click",e=>{const b=th.querySelector("[data-edit]"); if(b&&!e.target.closest("button")) openItemForm(state.items.find(i=>i.id===b.dataset.edit));}));
+  renderAlerts(c); renderChart(c); renderNotices();
+}
+
+function pinRows(){
+  const wrap=$("#gridwrap"); const thead=wrap.querySelector("thead"); const cash=wrap.querySelector("tr.cash");
+  if(!thead||!cash) return;
+  const r=wrap.getBoundingClientRect(); const hh=thead.offsetHeight; const ch=cash.offsetHeight;
+  const top=Math.max(0,Math.min(-r.top, r.height-hh-ch));
+  const vh=document.documentElement.clientHeight;
+  let bottom=Math.max(0,Math.min(r.bottom-vh, r.height-hh-ch));
+  if(r.top>vh-hh-ch-60) bottom=0;
+  thead.querySelectorAll("th").forEach(el=>{el.style.transform=top?`translateY(${top}px)`:""});
+  cash.querySelectorAll("th,td").forEach(el=>{el.style.transform=bottom?`translateY(-${bottom}px)`:""});
+}
+let pinTick=false;
+const pinSched=()=>{if(pinTick)return;pinTick=true;requestAnimationFrame(()=>{pinTick=false;pinRows();})};
+window.addEventListener("scroll",pinSched,{passive:true}); window.addEventListener("resize",pinSched);
+
+function dailySeries(c){
+  const ev={}; const dates=new Set();
+  const add=(it,dateISO,amt,status)=>{ const k=it.id+"|"+dateISO; if(!ev[k]) ev[k]={amt:0,paid:0,due:0,statuses:new Set(),kind:it.kind}; ev[k].amt+=amt; if(status==="paid") ev[k].paid+=amt; if(status==="due") ev[k].due+=amt; ev[k].statuses.add(status); dates.add(dateISO); };
+  for(const it of state.items) for(const w of c.weeks){ const ci=cellInfo(it,w); if(!ci) continue; for(const part of ci.parts){ if(part.occ.length){ const per=part.amount/part.occ.length; for(const d of part.occ) add(it,toISO(d.pay||d),per,part.status);} else add(it,toISO(w),part.amount,part.status);} }
+  const days=[...dates].sort(); const pts=[]; const asOfISO=state.asOf;
+  for(const iso of days){ const past=iso<=asOfISO; let e=0,i=0; for(const k of Object.keys(ev)){ if(!k.endsWith("|"+iso)) continue; const x=ev[k]; const a=past?x.paid+x.due:x.due; if(!a) continue; if(x.kind==="bill") e+=a; else i+=a; } pts.push({d:fromISO(iso),exp:e,inc:i,cash:0,past}); }
+  const fi=pts.findIndex(p=>!p.past); let bal=c.start-(c.pending||0);
+  for(let i=Math.max(fi,0);i<pts.length;i++){ bal=bal-pts[i].exp+pts[i].inc; pts[i].cash=bal; }
+  let back=c.start-(c.pending||0); for(let i=(fi<0?pts.length:fi)-1;i>=0;i--){ pts[i].cash=back; back=back+pts[i].exp-pts[i].inc; }
+  return pts;
+}
+function renderDaily(c,monthly){
+  const asOf=fromISO(state.asOf); const c0=compute();
+  const ev={}; const dates=new Set();
+  const gk=iso=>monthly?iso.slice(0,7):iso;
+  const pendingDays=new Set();
+  const add=(it,dateISO,amt,status,weekISO,explicit,sched)=>{ const g=gk(dateISO); const k=it.id+"|"+g; if(!ev[k]) ev[k]={amt:0,status,weekISO,statuses:new Set(),dates:[]}; ev[k].amt+=amt; ev[k].statuses.add(status); ev[k].dates.push(dateISO); dates.add(g); if(explicit) ev[k].explicit=true; if(sched&&status==="due") ev[k].sched=true; if(status==="due"&&dateISO<=state.asOf) pendingDays.add(g); };
+  for(const it of state.items){
+    for(const w of c.weeks){
+      const ci=cellInfo(it,w); if(!ci) continue;
+      for(const part of ci.parts){
+        const ex=!!(part.ov&&part.ov.status);
+        if(part.occ.length){ const per=part.amount/part.occ.length; for(const d of part.occ) add(it,toISO(d.pay||d),per,part.status,toISO(w),ex,part.sched); }
+        else add(it,toISO(w),part.amount,part.status,toISO(w),ex,part.sched);
+      }
+    }
+  }
+  const showPast=!!state.settings.showPast;
+  const days=[...dates].sort().filter(g=>showPast||pendingDays.has(g)||(monthly?g>=ym(asOf):g>state.asOf));
+  const isToday=iso=>{ if(monthly) return iso===ym(asOf); const d=fromISO(iso);return d<=asOf&&asOf<addDays(d,1)};
+  let h=`<table class="grid daily${monthly?" monthly":""}"><thead><tr><th class="rowhead">${monthly?"Month":"Day"}</th>`;
+  for(const iso of days){ if(monthly){const [y,m]=iso.split("-");const d=new Date(Number(y),Number(m)-1,1);h+=`<th class="${isToday(iso)?"today":""}"><span class="m">${y}</span>${d.toLocaleDateString("en-US",{month:"long"})}</th>`;} else {const d=fromISO(iso); const pend=pendingDays.has(iso); h+=`<th class="${isToday(iso)?"today":""}${pend?" pend":""}${iso<=state.asOf?" pastcol":""}"><span class="m">${d.getFullYear()} · ${d.toLocaleDateString("en-US",{weekday:"short"})}</span>${fmtShort(d)}<button class="colx" data-markday="${iso}" title="Remove this day: every payment and deposit on it is taken out">×</button>${pend?`<span class="m" style="color:var(--warn)">not crossed</span>`:""}</th>`} }
+  h+=`</tr></thead><tbody>`;
+  const rowFor=it=>{
+    let r=`<tr class="${it.kind}"><th class="rowhead">${esc(it.name)}<button class="edit" data-edit="${it.id}" aria-label="Edit ${esc(it.name)}">&#9998; edit</button><span class="meta">${fmt(it.amount)} · ${schedLabel(it)}</span>${it.note?`<span class="note">${esc(it.note)}</span>`:""}</th>`;
+    for(const iso of days){
+      const e=ev[it.id+"|"+iso];
+      if(!e){ if(monthly){ r+=`<td class="cell empty mo${isToday(iso)?" today":""}" data-item="${it.id}" data-week=""></td>`; } else r+=`<td class="cell empty${isToday(iso)?" today":""}" data-item="${it.id}" data-week="${toISO(weekStartOf(fromISO(iso)))}" data-date="${iso}">+</td>`; continue; }
+      let st=e.statuses.has("due")?"due":(e.statuses.has("paid")?"paid":"skip");
+      const isPastCol=monthly?iso<ym(asOf):iso<=state.asOf; if(isPastCol&&st==="paid"&&!e.explicit) st="past";
+      if(monthly){ r+=`<td class="cell mo ${st}${e.sched?" sched":""}${isToday(iso)?" today":""}" data-item="${it.id}" data-week="${e.dates.length===1?toISO(weekStartOf(fromISO(e.dates[0]))):""}" title="${e.dates.map(x=>fmtShort(fromISO(x))).join(", ")}" · click to edit this item"">${fmt(e.amt)}<span class="dd">${e.dates.length>1?e.dates.length+" payments":fmtShort(fromISO(e.dates[0]))}</span></td>`; continue; }
+      r+=`<td class="cell ${st}${e.sched?" sched":""}${isToday(iso)?" today":""}" data-item="${it.id}" data-week="${e.weekISO}" data-date="${iso}" title="${st==="paid"?"Already out of your account":st==="skip"?"Skipped":(e.sched?"Scheduled, not out yet · ":"Due ")+fmtDate(fromISO(iso))}">${fmt(e.amt)}</td>`;
+    }
+    return r+`</tr>`;
+  };
+  const bills=state.items.filter(i=>i.kind==="bill"), income=state.items.filter(i=>i.kind==="income");
+  h+=`<tr class="section"><th class="rowhead">Bills</th><td colspan="${days.length}"></td></tr>`;
+  for(const b of bills) h+=rowFor(b);
+  h+=`<tr class="addline"><th class="rowhead"><button class="btn small" data-add="bill">+ Add a bill</button></th><td colspan="${days.length}"></td></tr>`;
+  const dayExp={},dayInc={}; for(const iso of days){dayExp[iso]=0;dayInc[iso]=0;}
+  for(const k of Object.keys(ev)){ const [id,iso]=k.split("|"); if(!(iso in dayExp)) continue; const it=state.items.find(i=>i.id===id); const e=ev[k]; const past=monthly?iso<ym(asOf)||iso===ym(asOf):iso<=state.asOf; if(past?(e.statuses.has("skip")&&e.statuses.size===1):!e.statuses.has("due")) continue; if(it.kind==="bill") dayExp[iso]+=e.amt; else dayInc[iso]+=e.amt; }
+  h+=`<tr class="total"><th class="rowhead">Total expenses</th>`; for(const iso of days) h+=`<td class="${isToday(iso)?"today":""}">${fmt(dayExp[iso])}</td>`;
+  h+=`</tr><tr class="section inc"><th class="rowhead">Income</th><td colspan="${days.length}"></td></tr>`;
+  for(const i of income) h+=rowFor(i);
+  h+=`<tr class="addline"><th class="rowhead"><button class="btn small" data-add="income">+ Add income</button></th><td colspan="${days.length}"></td></tr>`;
+  h+=`<tr class="total inc"><th class="rowhead">Total income</th>`; for(const iso of days) h+=`<td class="${isToday(iso)?"today":""}">${fmt(dayInc[iso])}</td>`;
+  h+=`</tr><tr class="cash"><th class="rowhead">Cash left</th>`;
+  const series=dailySeries(c); const cashAt={}; if(monthly){ for(const pt of series){ cashAt[ym(pt.d)]=pt.cash; } } else { for(const pt of series) cashAt[toISO(pt.d)]=pt.cash; }
+  for(const iso of days){ const bal=cashAt[iso]??0; h+=`<td class="${cashClass(bal)}${isToday(iso)?" today":""}">${fmt(bal)}</td>`; }
+  h+=`</tr></tbody></table>`;
+  $("#gridwrap").innerHTML=h; pinRows();
+  $("#gridwrap").querySelectorAll("td.cell:not(.mo)").forEach(td=>td.addEventListener("click",e=>openPop(td)));
+  $("#gridwrap").querySelectorAll("[data-markday]").forEach(th=>th.addEventListener("click",e=>{ e.stopPropagation(); const iso=th.dataset.markday; let n=0; const removedNow=[]; for(const it of state.items){ const e=ev[it.id+"|"+iso]; if(!e) continue; for(const w of c0.weeks){ const ci=cellInfo(it,w); if(!ci) continue; for(const part of ci.parts){ const hit=part.occ.length?part.occ.some(d=>toISO(d.pay||d)===iso):toISO(w)===iso; if(!hit) continue; const o=state.overrides[part.key]||{}; if(o.amount==null) o.amount=part.amount; o.status="skip"; o.deleted=true; o.date=iso; state.overrides[part.key]=o; removedNow.push(part.key); n++; } } } state.settings.lastRemoved=removedNow; log("removed day "+iso+" ("+n+")"); touch("remove day"); renderAll(); toast(`${n} payment${n===1?"":"s"} on ${fmtShort(fromISO(iso))} removed`); }));
+  $("#gridwrap").querySelectorAll("td.cell.mo").forEach(td=>td.addEventListener("click",e=>{ openItemForm(state.items.find(i=>i.id===td.dataset.item)); }));
+  $("#gridwrap").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();openItemForm(state.items.find(i=>i.id===b.dataset.edit))}));
+  $("#gridwrap").querySelectorAll("tbody th.rowhead").forEach(th=>th.addEventListener("click",e=>{const b=th.querySelector("[data-edit]"); if(b&&!e.target.closest("button")) openItemForm(state.items.find(i=>i.id===b.dataset.edit));}));
+  renderAlerts(c); renderChart(c); renderNotices();
+}
+
+function renderAlerts(c){
+  const f=Number(state.settings.floor||0);
+  if((state.settings.view||"daily")!=="weekly"){
+    const pts=dailySeries(c).filter(p=>!p.past); let h="";
+    if(pts.length){
+      const firstNeg=pts.find(r=>r.cash<0), firstLow=pts.find(r=>r.cash<f);
+      const min=pts.reduce((m,r)=>r.cash<m.cash?r:m,pts[0]); const last=pts[pts.length-1];
+      if(firstNeg) h+=`<span class="chip crit"><span class="dot"></span>Goes negative on ${fmtDate(firstNeg.d)} (${fmt(firstNeg.cash)})</span>`;
+      else if(firstLow) h+=`<span class="chip warn"><span class="dot"></span>Dips below ${fmt(f)} on ${fmtDate(firstLow.d)} (${fmt(firstLow.cash)})</span>`;
+      else h+=`<span class="chip ok"><span class="dot"></span>Stays above ${fmt(f)} for the next ${c.rows.filter(r=>!r.past).length} weeks</span>`;
+      h+=`<span class="chip ${cashClass(min.cash)}">Low point ${fmt(min.cash)} · ${fmtDate(min.d)}</span>`;
+      h+=`<span class="chip ${cashClass(last.cash)}">Ends at ${fmt(last.cash)} · ${fmtDate(last.d)}</span>`;
+      const totExp=pts.reduce((a,r)=>a+r.exp,0), totInc=pts.reduce((a,r)=>a+r.inc,0);
+      $("#chartSummary").textContent=`${fmt(totInc)} in · ${fmt(totExp)} out over ${c.rows.filter(r=>!r.past).length} weeks`;
+    }
+    $("#alerts").innerHTML=h; return;
+  }
+  const firstNeg=c.rows.find(r=>r.cash<0), firstLow=c.rows.find(r=>r.cash<f);
+  const min=c.rows.reduce((m,r)=>r.cash<m.cash?r:m,c.rows[0]);
+  let h="";
+  if(firstNeg) h+=`<span class="chip crit"><span class="dot"></span>Goes negative the week of ${fmtDate(firstNeg.w)} (${fmt(firstNeg.cash)})</span>`;
+  else if(firstLow) h+=`<span class="chip warn"><span class="dot"></span>Dips below ${fmt(f)} the week of ${fmtDate(firstLow.w)} (${fmt(firstLow.cash)})</span>`;
+  else h+=`<span class="chip ok"><span class="dot"></span>Stays above ${fmt(f)} for the next ${c.rows.filter(r=>!r.past).length} weeks</span>`;
+  const minDay=c.rows.reduce((m,r)=>r.low<m.low?r:m,c.rows[0]);
+  if(min) h+=`<span class="chip ${cashClass(min.cash)}">Lowest week end ${fmt(min.cash)} · ${fmtDate(min.w)}</span>`;
+  if(minDay&&minDay.lowDay&&minDay.low<min.cash) h+=`<span class="chip ${cashClass(minDay.low)}">Lowest day ${fmt(minDay.low)} · ${fmtDate(minDay.lowDay)}</span>`;
+  const last=c.rows[c.rows.length-1];
+  if(last) h+=`<span class="chip ${cashClass(last.cash)}">Ends at ${fmt(last.cash)} · ${fmtDate(last.w)}</span>`;
+  $("#alerts").innerHTML=h;
+  const totExp=c.rows.reduce((a,r)=>a+r.exp,0), totInc=c.rows.reduce((a,r)=>a+r.inc,0);
+  $("#chartSummary").textContent=`${fmt(totInc)} in · ${fmt(totExp)} out over ${c.rows.filter(r=>!r.past).length} weeks`;
+}
+
+function renderChart(c){
+  const box=$("#chartbox");
+  const daily=(state.settings.view||"daily")!=="weekly";
+  const showPast=!!state.settings.showPast;
+  const pts=(daily?dailySeries(c):c.rows.map(r=>({d:r.w,exp:r.exp,inc:r.inc,cash:r.cash,past:r.past}))).filter(p=>showPast||!p.past);
+  if(!pts.length){box.innerHTML="";return}
+  const W=900,H=260,pl=64,pr=78,pt=16,pb=34;
+  const vals=pts.map(r=>r.cash);
+  const f=Number(state.settings.floor||0);
+  let lo=Math.min(0,...vals,f), hi=Math.max(...vals,f);
+  const pad=(hi-lo)*0.08||100; lo-=pad; hi+=pad;
+  const t0=pts[0].d.getTime(), t1=pts[pts.length-1].d.getTime()||t0+1;
+  const x=i=>pl+((pts[i].d.getTime()-t0)/((t1-t0)||1))*(W-pl-pr);
+  const y=v=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
+  const cs=getComputedStyle(document.documentElement);
+  const col=n=>cs.getPropertyValue(n).trim();
+  const nice=(hi-lo)/4; const mag=Math.pow(10,Math.floor(Math.log10(nice))); const step=Math.ceil(nice/mag)*mag;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Projected cash left">`;
+  s+=`<rect x="${pl}" y="${y(f)}" width="${W-pl-pr}" height="${Math.max(0,y(lo+pad)-y(f))}" fill="${col("--warn-soft")}" opacity=".9"/>`;
+  if(lo<0) s+=`<rect x="${pl}" y="${y(0)}" width="${W-pl-pr}" height="${Math.max(0,y(lo+pad)-y(0))}" fill="${col("--crit-soft")}" opacity=".9"/>`;
+  for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step){
+    s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="${col("--line")}" stroke-width="1"/>`;
+    s+=`<text x="${pl-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="${col("--muted")}">${fmt(v)}</text>`;
+  }
+  s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(0)}" y2="${y(0)}" stroke="${col("--line-strong")}" stroke-width="1.5"/>`;
+  if(f>lo&&f<hi){ s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(f)}" y2="${y(f)}" stroke="${col("--crit")}" stroke-width="1.5" stroke-dasharray="6 4"/><text x="${W-pr-4}" y="${y(f)-5}" text-anchor="end" font-size="11" font-weight="600" fill="${col("--crit")}">${fmt(f)} floor</text>`; }
+  const labelEvery=Math.max(1,Math.ceil((t1-t0)/864e5/9/7))*7*864e5;
+  let nextLabel=t0;
+  pts.forEach((r,i)=>{ if(r.d.getTime()>=nextLabel){ s+=`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="${col("--muted")}">${fmtShort(r.d)}${r.d.getMonth()===0&&r.d.getDate()<=7?" "+r.d.getFullYear():""}</text>`; nextLabel=r.d.getTime()+labelEvery; } });
+  const line=pts.map((r,i)=>`${x(i)},${y(r.cash)}`).join(" ");
+  s+=`<polygon points="${x(0)},${y(lo+pad)} ${line} ${x(pts.length-1)},${y(lo+pad)}" fill="${col("--accent")}" opacity=".10"/>`;
+  s+=`<polyline points="${line}" fill="none" stroke="${col("--accent")}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  pts.forEach((r,i)=>{ const k=cashClass(r.cash); const fill=k==="crit"?col("--crit"):k==="warn"?col("--warn"):col("--accent"); s+=`<circle cx="${x(i)}" cy="${y(r.cash)}" r="${k==="ok"?(daily?2.2:3):(daily?3:4.5)}" fill="${fill}" stroke="${col("--surface")}" stroke-width="${daily?1.5:2}"/>`; });
+  const last=pts[pts.length-1];
+  s+=`<text x="${x(pts.length-1)+10}" y="${y(last.cash)+4}" text-anchor="start" font-size="12" font-weight="600" fill="${col("--ink")}">${fmt(last.cash)}</text>`;
+  s+=`<line id="cross" x1="0" x2="0" y1="${pt}" y2="${H-pb}" stroke="${col("--ink")}" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>`;
+  s+=`<rect x="${pl}" y="${pt}" width="${W-pl-pr}" height="${H-pt-pb}" fill="transparent" id="hit"/>`;
+  s+=`</svg><div class="tip" id="tip"></div>`;
+  box.innerHTML=s;
+  const svg=box.querySelector("svg"),hit=$("#hit"),tip=$("#tip"),cross=$("#cross");
+  hit.addEventListener("mousemove",e=>{
+    const rect=svg.getBoundingClientRect(); const px=(e.clientX-rect.left)/rect.width*W;
+    let best=0,bd=Infinity; pts.forEach((r,i)=>{const d=Math.abs(x(i)-px); if(d<bd){bd=d;best=i}});
+    const r=pts[best]; cross.setAttribute("x1",x(best));cross.setAttribute("x2",x(best));cross.setAttribute("opacity",".6");
+    tip.style.display="block"; tip.style.left=(x(best)/W*rect.width)+"px"; tip.style.top=(y(r.cash)/H*rect.height)+"px";
+    tip.innerHTML=`<b>${daily?fmtDate(r.d):"Week of "+fmtDate(r.d)}</b><br>Cash left ${fmt(r.cash)}<br>In ${fmt(r.inc)} · Out ${fmt(r.exp)}`;
+  });
+  hit.addEventListener("mouseleave",()=>{tip.style.display="none";cross.setAttribute("opacity","0")});
+}
+
+function findAccount(tag){ if(!tag) return null; return state.accounts.find(a=>a.id===tag)||state.accounts.find(a=>a.name&&a.name.includes(tag))||null; }
+function defaultAccount(){ return state.accounts.find(a=>a.id===state.settings.defaultAccount)||state.accounts.find(a=>!a.exclude)||state.accounts[0]||null; }
+function accountPlan(c){
+  const cushion=Number(state.settings.cushion??250);
+  const def=defaultAccount(); if(!def) return {transfers:[],lows:{},unassigned:0};
+  const bal={}; for(const a of state.accounts) bal[a.id]=Number(a.balance||0);
+  const events=[]; let unassigned=0;
+  for(const it of state.items){
+    const acct=findAccount(it.account)||def; if(!findAccount(it.account)) unassigned++;
+    for(const w of c.weeks){ const ci=cellInfo(it,w); if(!ci) continue;
+      for(const part of ci.parts){ if(part.status!=="due") continue;
+        if(part.occ.length){ const per=part.amount/part.occ.length; for(const d of part.occ) events.push({d:d.pay||d,kind:it.kind,amt:per,acct:acct.id,name:it.name}); }
+        else events.push({d:w,kind:it.kind,amt:part.amount,acct:acct.id,name:it.name}); } }
+  }
+  events.sort((a,b)=>(a.d-b.d)||(a.kind==="bill"?-1:1));
+  const hasBills={}; for(const e of events) if(e.kind==="bill") hasBills[e.acct]=true;
+  const cushionFor=id=>hasBills[id]?cushion:0;
+  const lows={}; for(const a of state.accounts) lows[a.id]={min:bal[a.id],date:null};
+  const transfers=[]; const asOf=fromISO(state.asOf);
+  let i=0;
+  const lowAhead=(acctId,startBal,fromIdx,day,afterEvt)=>{ let b=startBal, low=startBal; const limit=addDays(day,Number(state.settings.lookahead||14)); let passed=!afterEvt; for(let j=fromIdx;j<events.length;j++){ const f=events[j]; if(f===afterEvt){passed=true;continue;} if(!passed) continue; if(f.acct!==acctId) continue; if(f.d>limit) break; if(f.kind==="income"&&f.d>day) break; if(f.kind==="bill"){ b-=f.amt; if(b<low) low=b; } } return low; };
+  while(i<events.length){
+    const day=events[i].d; const dayStart=i; const todays=[]; while(i<events.length&&events[i].d.getTime()===day.getTime()) todays.push(events[i++]);
+    for(const e of todays.filter(e=>e.kind==="bill")){
+      bal[e.acct]-=e.amt;
+      const acctObj=state.accounts.find(a=>a.id===e.acct);
+      if(bal[e.acct]<cushion&&acctObj&&!acctObj.exclude){
+        const lowest=lowAhead(e.acct,bal[e.acct],dayStart,day,e);
+        let need=Math.ceil((cushion-lowest)/10)*10;
+        const by=addDays(day,-1)<asOf?asOf:addDays(day,-1);
+        const cands=state.accounts.filter(a=>a.id!==e.acct&&!a.exclude).map(a=>({id:a.id,avail:Math.max(0,Math.floor((lowAhead(a.id,bal[a.id],dayStart,day,null)-cushionFor(a.id))/10)*10),pure:!hasBills[a.id]})).sort((a,b)=>(b.pure-a.pure)||(b.avail-a.avail));
+        let remaining=need;
+        for(const cnd of cands){ if(remaining<=0) break; const amt=Math.min(remaining,cnd.avail); if(amt<=0) continue; transfers.push({by,amt,need,from:cnd.id,to:e.acct,trigger:e.name,day,short:0}); bal[cnd.id]-=amt; bal[e.acct]+=amt; remaining-=amt; }
+        if(remaining>0){ transfers.push({by,amt:0,need,from:null,to:e.acct,trigger:e.name,day,short:remaining}); }
+      }
+      if(bal[e.acct]<lows[e.acct].min){ lows[e.acct]={min:bal[e.acct],date:day}; }
+    }
+    for(const e of todays.filter(e=>e.kind==="income")) bal[e.acct]+=e.amt;
+  }
+  const dis=state.settings.dismissed||{}; const merged=[]; for(const t of transfers){ if(dis["t:"+t.from+":"+t.to+":"+toISO(t.by)]) continue; const m=merged.find(x=>x.from===t.from&&x.to===t.to&&x.by.getTime()===t.by.getTime()); if(m){ m.amt+=t.amt; m.short+=t.short; } else merged.push(Object.assign({},t)); }
+  return {transfers:merged,lows,unassigned,cushion,def,hasBills};
+}
+function floorPlan(c){
+  const floor=Number(state.settings.floor||0);
+  const ev=[];
+  for(const it of state.items) for(const w of c.weeks){ const ci=cellInfo(it,w); if(!ci) continue; for(const p of ci.parts){ if(p.status!=="due") continue; if(p.occ.length){ const per=p.amount/p.occ.length; for(const d of p.occ) ev.push({d:new Date(d.pay||d),kind:it.kind,amt:per,name:it.name,key:p.key,movable:it.kind==="bill"&&p.occ.length===1&&per>0&&!it.savings}); } else ev.push({d:new Date(w),kind:it.kind,amt:p.amount,name:it.name,key:p.key,movable:false}); } }
+  ev.sort((a,b)=>a.d-b.d);
+  const run=list=>{ const days=[]; let bal=c.start,i=0; while(i<list.length){ const d=list[i].d; let e=0,inc=0; while(i<list.length&&list[i].d.getTime()===d.getTime()){ if(list[i].kind==="bill") e+=list[i].amt; else inc+=list[i].amt; i++; } bal+=inc-e; days.push({d,bal}); } return days; };
+  const dis=state.settings.dismissed||{}; const sugg=[]; const moved=new Set(); for(const k of Object.keys(dis)) if(k.startsWith("m:")) moved.add(k.slice(2)); let fail=null;
+  for(let guard=0;guard<20;guard++){
+    const days=run(ev); const bad=days.find(x=>x.bal<floor-0.5); if(!bad) break;
+    let lastOk=null; for(const x of days){ if(x.d>=bad.d) break; if(x.bal>=floor) lastOk=x.d; }
+    const cands=ev.filter(e=>e.movable&&!moved.has(e.key)&&e.d<=bad.d&&(!lastOk||e.d>lastOk)).sort((a,b)=>b.amt-a.amt);
+    const need=floor-bad.bal;
+    const pick=cands.filter(x=>x.amt>=need).sort((a,b)=>a.amt-b.amt)[0]||cands[0];
+    if(!pick){ fail={d:bad.d,bal:bad.bal,need}; break; }
+    const rest=ev.filter(e=>e!==pick);
+    const incomes=[...new Set(ev.filter(e=>e.kind==="income"&&e.d>bad.d).map(e=>e.d.getTime()))].sort().slice(0,24);
+    let target=null;
+    const clean=(td,span)=>{ const all=rest.concat([Object.assign({},pick,{d:td})]).sort((a,b)=>a.d-b.d); const ds=run(all); const lim=addDays(td,span); for(const x of ds){ if(x.d<td) continue; if(x.d>lim) break; if(x.bal<floor-0.5) return false; } return true; };
+    for(const span of [45,14]){ for(const t of incomes){ const td=new Date(t); if(clean(td,span)){target=td;break;} } if(target) break; }
+    if(!target){ fail={d:bad.d,bal:bad.bal,need,name:pick.name}; break; }
+    sugg.push({name:pick.name,amt:pick.amt,from:new Date(pick.d),to:target,key:pick.key,dipDate:bad.d,dipBal:bad.bal});
+    pick.d=target; moved.add(pick.key); ev.sort((a,b)=>a.d-b.d);
+  }
+  const finalDays=run(ev); const low=finalDays.length?finalDays.reduce((m,x)=>x.bal<m.bal?x:m,finalDays[0]):null;
+  const net=ev.reduce((a,e)=>a+(e.kind==="income"?e.amt:-e.amt),0);
+  const byYear={}; for(const e of ev){ const y=e.d.getFullYear(); byYear[y]=(byYear[y]||0)+(e.kind==="income"?e.amt:-e.amt); }
+  return {floor,sugg,fail,low,net,byYear};
+}
+function applyMove(key,toISOdate){ const o=state.overrides[key]||{}; delete o.shift; o.moveTo=toISOdate; if(!o.status) o.status="due"; state.overrides[key]=o; log("planner move "+key+" -> "+toISOdate); }
+function renderNotices(){
+  const el=$("#notices"); if(!el) return;
+  const c=compute(); const plan=accountPlan(c);
+  const an=id=>(state.accounts.find(a=>a.id===id)||{}).name||"?";
+  let h=`<div class="head"><div><div class="help">Transfers between the accounts that count toward cash (savings and any other set-aside account are never touched), each sized to carry the account until its next deposit, up to ${Number(state.settings.lookahead||14)} days. Recomputed from the balances above.</div></div><label>Keep at least $<input type="number" id="cushion" step="50" value="${plan.cushion??250}"> in each account that pays bills</label></div>`;
+  const fp=floorPlan(c);
+  h+=`<h3 style="margin:4px 0 6px">Stay above ${fmt(fp.floor)}</h3><div class="help" style="margin-bottom:8px">Bills moved to a later date so the projected balance never drops below your floor. Each move lands on a payday, and you can undo it from the payment popup (Put back).</div>`;
+  if(!fp.sugg.length&&!fp.fail) h+=`<div class="notice ok">Nothing to move: the balance stays above ${fmt(fp.floor)} through the whole horizon${fp.low?" (low point "+fmt(fp.low.bal)+" on "+fmtShort(fp.low.d)+")":""}.</div>`;
+  fp.sugg.forEach((sg,i)=>{ h+=`<div class="notice warn"><div class="when">${fmtDate(sg.dipDate)}</div><div class="what"><b>Move ${esc(sg.name)} ${fmt(sg.amt)}</b> from ${fmtShort(sg.from)} to ${fmtDate(sg.to)}<div class="why">without it the balance would be ${fmt(sg.dipBal)} on ${fmtShort(sg.dipDate)}</div></div><div class="nrow"><button class="btn small primary" data-fmove="${i}">Apply</button></div><button class="x" data-dismiss="m:${esc(sg.key)}" title="Discard this suggestion">×</button></div>`; });
+  if(fp.sugg.length>1) h+=`<div class="row" style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn small" id="fmoveAll">Apply all ${fp.sugg.length} moves</button></div>`;
+  if(fp.fail) h+=`<div class="notice crit"><div class="when">${fmtDate(fp.fail.d)}</div><div class="what"><b>${fmt(fp.fail.need)} short of the floor</b> (balance ${fmt(fp.fail.bal)})<div class="why">${fp.fail.name?"No later payday in the next 45 days can absorb "+esc(fp.fail.name)+"; ":"No bill before this date can be moved; "}moving payments only delays this.${Object.keys(fp.byYear).filter(y=>fp.byYear[y]<0).length?" Bills exceed income in "+Object.keys(fp.byYear).filter(y=>fp.byYear[y]<0).map(y=>y+" by "+fmt(-fp.byYear[y])).join(", ")+", so the fix is more income, a smaller recurring payment (the savings and 401K transfers are the biggest movable ones), or a transfer from savings.":" The fix is more income, a smaller payment, or a transfer from savings."}</div></div></div>`;
+  if(fp.sugg.length) h+=`<div class="help" style="margin-bottom:10px">After these moves the low point is ${fmt(fp.low?fp.low.bal:0)}${fp.low?" on "+fmtShort(fp.low.d):""}.</div>`;
+  h+=`<h3 style="margin:10px 0 6px">Between accounts</h3>`;
+  if(!plan.transfers.length) h+=`<div class="notice ok">No transfers needed for the next ${c.rows.filter(r=>!r.past).length} weeks with the balances entered.</div>`;
+  const shown=plan.transfers.slice(0,8);
+  shown.forEach((t,idx)=>{
+    const cls=t.short>0?"crit":(t.by-fromISO(state.asOf))/864e5<=7?"warn":"";
+    if(t.amt<=0&&t.short>0){ h+=`<div class="notice crit"><div class="when">By ${fmtDate(t.by)}</div><div class="what"><b>${fmt(t.short)} short</b> in ${esc(an(t.to))}<div class="why">${esc(t.trigger)} comes out on ${fmtShort(t.day)} and the other checking account cannot cover it without running short itself</div></div><button class="x" data-dismiss="t:${t.from}:${t.to}:${toISO(t.by)}" title="Discard this notice">×</button></div>`; return; }
+    h+=`<div class="notice ${cls}"><div class="when">By ${fmtDate(t.by)}</div><div class="what"><b>${fmt(t.amt)}</b> from ${esc(an(t.from))} to ${esc(an(t.to))}<div class="why">${esc(t.trigger)} comes out of ${esc(an(t.to))} on ${fmtShort(t.day)}${t.short>0?` · still short ${fmt(t.short)} after this`:""}</div></div>${t.amt>0?`<div class="nrow"><button class="btn small" data-move="${idx}">Mark as moved</button></div>`:""}<button class="x" data-dismiss="t:${t.from}:${t.to}:${toISO(t.by)}" title="Discard this suggestion">×</button></div>`;
+  });
+  if(plan.transfers.length>shown.length) h+=`<div class="help">${plan.transfers.length-shown.length} more later in the horizon.</div>`;
+  const nDis=Object.keys(state.settings.dismissed||{}).length; if(nDis) h+=`<div class="help" style="margin:4px 0 8px">${nDis} discarded suggestion${nDis>1?"s":""}. <a href="#" id="undismiss">Bring them back</a></div>`;
+  h+=`<div class="acctgrid">`+state.accounts.map(a=>{const l=plan.lows[a.id]; const k=l&&l.min<0?"crit":(l&&plan.hasBills[a.id]&&l.min<(plan.cushion??250)?"warn":""); return `<span class="acctpill ${k}">${esc(a.name)} · low <b>${fmt(l?l.min:0)}</b>${l&&l.date?" on "+fmtShort(l.date):""}${plan.transfers.length?" (after transfers)":""}</span>`}).join("")+`</div>`;
+  if(plan.unassigned) h+=`<div class="help" style="margin-top:8px">${plan.unassigned} item${plan.unassigned>1?"s have":" has"} no account set and ${plan.unassigned>1?"are":"is"} assumed to use ${esc((plan.def||{}).name||"")}. Set the account in each item's edit form for accurate notices.</div>`;
+  el.innerHTML=h;
+  const badge=$("#moneyBadge"); if(badge){ const n=plan.transfers.length+fp.sugg.length+(fp.fail?1:0); const soon=plan.transfers.some(t=>(t.by-fromISO(state.asOf))/864e5<=7)||fp.sugg.length>0; const short=plan.transfers.some(t=>t.short>0)||!!fp.fail; badge.hidden=n===0; badge.textContent=String(n); badge.className="badge"+(short?" crit":soon?" warn":""); }
+  $("#cushion").addEventListener("change",e=>{state.settings.cushion=Number(e.target.value||0);touch();renderNotices();});
+  el.querySelectorAll("[data-dismiss]").forEach(b=>b.addEventListener("click",()=>{ if(!state.settings.dismissed) state.settings.dismissed={}; state.settings.dismissed[b.dataset.dismiss]=true; log("dismissed "+b.dataset.dismiss); touch("dismiss suggestion"); renderAll(); }));
+  const ud=$("#undismiss"); if(ud) ud.addEventListener("click",e=>{ e.preventDefault(); state.settings.dismissed={}; touch("restore suggestions"); renderAll(); });
+  el.querySelectorAll("[data-fmove]").forEach(b=>b.addEventListener("click",()=>{ const sg=fp.sugg[Number(b.dataset.fmove)]; applyMove(sg.key,toISO(sg.to)); touch("planner move"); renderAll(); toast(`${sg.name} moved to ${fmtDate(sg.to)}`); }));
+  const fa=$("#fmoveAll"); if(fa) fa.addEventListener("click",()=>{ for(const sg of fp.sugg) applyMove(sg.key,toISO(sg.to)); touch("planner move all"); renderAll(); toast(`${fp.sugg.length} payments moved`); });
+  el.querySelectorAll("[data-move]").forEach(b=>b.addEventListener("click",()=>{
+    const t=plan.transfers[Number(b.dataset.move)]; const from=state.accounts.find(a=>a.id===t.from), to=state.accounts.find(a=>a.id===t.to);
+    if(from) from.balance=Number(from.balance||0)-t.amt; if(to) to.balance=Number(to.balance||0)+t.amt;
+    touch(); renderAll(); toast(`Balances adjusted: ${fmt(t.amt)} moved`);
+  }));
+}
+function monthlyOf(it){
+  const s=it.sched||{}; const a=Number(it.amount||0);
+  if(s.type==="monthly") return a;
+  if(s.type==="twice"||s.type==="twicefri") return a*2;
+  if(s.type==="weekly") return a*52/12;
+  if(s.type==="biweekly") return a*26/12;
+  if(s.type==="everyn") return a*(52/(Number(s.n)||2))/12;
+  return 0;
+}
+function renderAnalytics(){
+  const el=$("#analytics"); if(!el) return;
+  const c=compute();
+  const income=state.items.filter(i=>i.kind==="income");
+  const pts=dailySeries(c);
+  const byMonth={};
+  for(const r of pts){const k=ym(r.d); if(!byMonth[k]) byMonth[k]={inc:0,exp:0}; byMonth[k].inc+=r.inc; byMonth[k].exp+=r.exp;}
+  const first=fromISO(state.historyStart||state.asOf), last=addDays(c.weeks[c.weeks.length-1],6);
+  const full=Object.keys(byMonth).filter(k=>{const [y,m]=k.split("-").map(Number); const ms=new Date(y,m-1,1), me=new Date(y,m,0); return ms>=first&&me<=last;}).sort();
+  const incs=full.map(k=>byMonth[k].inc), exps=full.map(k=>byMonth[k].exp);
+  const mn=arr=>arr.length?Math.min(...arr):0, mx=arr=>arr.length?Math.max(...arr):0, av=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+  const label=k=>{const [y,m]=k.split("-").map(Number); return new Date(y,m-1,1).toLocaleDateString("en-US",{month:"short",year:"numeric"})};
+  const iMin=full[incs.indexOf(mn(incs))], iMax=full[incs.indexOf(mx(incs))];
+  let netMonthly=0, grossMonthly=0, grossAnnual=0;
+  let rows="";
+  for(const it of income){
+    const m=monthlyOf(it); const yr=m*12;
+    const up=1+Number(state.settings.uplift??32)/100;
+    const g=it.gross?Number(it.gross):yr*up; const gm=g/12;
+    netMonthly+=m; grossMonthly+=gm; grossAnnual+=g;
+    rows+=`<tr><td>${esc(it.name)}<span class="sub"> · ${schedLabel(it)}</span></td><td class="n">${fmt(m)}</td><td class="n">${fmt(yr)}</td><td class="n">${fmt(gm)}</td><td class="n">${fmt(g)}</td><td class="sub">${it.gross?"take-home; gross entered":"contract income + "+Number(state.settings.uplift??32)+"%"}</td></tr>`;
+  }
+  el.innerHTML=`<div class="head"><div><h2>Income analytics</h2><div class="help">What lands in the accounts each month, and what it represents in gross revenue.</div></div><div class="help">${full.length} full months from ${fmtDate(fromISO(state.historyStart||state.asOf))} · <label>Salary-equivalent uplift on contract income <input type="number" id="uplift" step="1" value="${Number(state.settings.uplift??32)}" style="width:56px;border:1px solid var(--line-strong);border-radius:6px;padding:2px 6px;background:var(--surface)">%</label></div></div>
+  <div class="tiles">
+    <div class="tile income"><div class="lab">Monthly income range</div><div class="val">${fmt(mn(incs))} – ${fmt(mx(incs))}</div><div class="sub">lowest ${iMin?label(iMin):""}, highest ${iMax?label(iMax):""} · average ${fmt(av(incs))}</div></div>
+    <div class="tile income"><div class="lab">Scheduled income per month</div><div class="val">${fmt(netMonthly)}</div><div class="sub">${fmt(netMonthly*12)} per year, as it lands</div></div>
+    <div class="tile gross"><div class="lab">Salary-equivalent gross per month</div><div class="val">${fmt(grossMonthly)}</div><div class="sub">contract income grossed up ${Number(state.settings.uplift??32)}%, Andrew at his real gross</div></div>
+    <div class="tile gross"><div class="lab">Salary-equivalent gross per year</div><div class="val">${fmt(grossAnnual)}</div><div class="sub">household, all sources</div></div>
+    <div class="tile"><div class="lab">Monthly expenses range</div><div class="val">${fmt(mn(exps))} – ${fmt(mx(exps))}</div><div class="sub">average ${fmt(av(exps))} over the full months since the start date, one-time items included</div></div>
+    <div class="tile ${av(incs)-av(exps)>=0?"income":""}"><div class="lab">Average monthly surplus</div><div class="val">${fmt(av(incs)-av(exps))}</div><div class="sub">average income minus average expenses in view</div></div>
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>Source</th><th class="n">Lands per month</th><th class="n">Lands per year</th><th class="n">Salary equivalent per month</th><th class="n">Salary equivalent per year</th><th></th></tr></thead>
+  <tbody>${rows}</tbody>
+  <tfoot><tr><td>Total</td><td class="n">${fmt(netMonthly)}</td><td class="n">${fmt(netMonthly*12)}</td><td class="n">${fmt(grossMonthly)}</td><td class="n">${fmt(grossAnnual)}</td><td></td></tr></tfoot></table></div>
+  <div class="foot">"Lands" is the scheduled amount that reaches your accounts (twice-monthly sources count 24 times a year, every-N-weeks sources 52/N). For a source that is take-home pay, enter its annual gross in the edit form and it is used as is; every other source is contract income and is grossed up by the uplift percentage to show what it would be worth as a salary. The monthly range uses only complete months inside the current horizon and includes any one-time or adjusted amounts.</div>`;
+  const u=$("#uplift"); if(u){ u.addEventListener("change",()=>{state.settings.uplift=Number(u.value||0); touch();}); }
+}
+
+function renderLoans(){
+  const t=$("#loansTable");
+  let h=`<thead><tr><th>Loan</th><th style="text-align:right">Rate %</th><th style="text-align:right">Balance</th><th></th></tr></thead><tbody>`;
+  for(const l of state.loans) h+=`<tr data-id="${l.id}"><td><input value="${esc(l.name)}" data-f="name"></td><td class="num"><input class="num" type="number" step="0.01" value="${l.rate}" data-f="rate"></td><td class="num"><input class="num" type="number" step="1" value="${l.balance}" data-f="balance"></td><td><button class="x" data-del="${l.id}" title="Remove">×</button></td></tr>`;
+  const tot=state.loans.reduce((a,l)=>a+Number(l.balance||0),0);
+  h+=`</tbody><tfoot><tr><td>Total owed</td><td></td><td class="num">${fmt(tot)}</td><td></td></tr></tfoot>`;
+  t.innerHTML=h;
+  t.querySelectorAll("input").forEach(inp=>{
+    const apply=()=>{const l=state.loans.find(x=>x.id===inp.closest("tr").dataset.id);l[inp.dataset.f]=inp.type==="number"?Number(inp.value||0):inp.value;touch();};
+    inp.addEventListener("input",apply);
+    inp.addEventListener("change",()=>{apply();renderLoans();});
+  });
+  t.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{state.loans=state.loans.filter(l=>l.id!==b.dataset.del);touch();renderLoans();}));
+  $("#loansDate").value=state.loansDate||"";
+}
+
+const restoreKey=k=>{ const o=state.overrides[k]; if(!o) return; delete o.deleted; if(o.status==="skip") o.status="due"; };
+const removedLabel=k=>{ const it=state.items.find(i=>k.startsWith(i.id+"__")); const o=state.overrides[k]||{}; return (it?it.name:"?")+" · "+(o.date?fmtShort(fromISO(o.date)):"week of "+fmtShort(fromISO(k.slice(k.indexOf("__")+2))))+" · "+fmt(o.amount!=null?o.amount:(it?it.amount:0)); };
+function renderRemoved(){ const el=$("#removedLine"); if(!el) return; const ks=Object.keys(state.overrides).filter(k=>state.overrides[k]&&state.overrides[k].deleted); el.hidden=!ks.length; if(!ks.length) return;
+  const last=(state.settings.lastRemoved||[]).filter(k=>ks.includes(k));
+  el.innerHTML=`${ks.length} removed payment${ks.length>1?"s":""}.${last.length?` <a href="#" id="undoRemoved">Undo the last removal (${last.length})</a> ·`:""} <a href="#" id="manageRemoved">See the list</a>`;
+  const u=$("#undoRemoved"); if(u) u.addEventListener("click",e=>{ e.preventDefault(); for(const k of last) restoreKey(k); state.settings.lastRemoved=[]; touch("undo removal"); renderAll(); toast(`${last.length} payment${last.length>1?"s":""} back`); });
+  $("#manageRemoved").addEventListener("click",e=>{ e.preventDefault(); const d=$("#dialog"); d.innerHTML=`<h2>Removed payments</h2><div class="help" style="margin:-8px 0 10px">Each one stays out until you bring it back here.</div><div class="form" style="grid-template-columns:1fr">${ks.map(k=>`<label style="flex-direction:row;align-items:center;justify-content:space-between;gap:8px"><span>${esc(removedLabel(k))}</span><button class="btn small" data-restore="${esc(k)}">Bring back</button></label>`).join("")}</div><div class="foot"><div class="r"><button class="btn" id="rmClose">Close</button></div></div>`; $("#modal").classList.add("open"); modalSaveIfDirty=()=>false; $("#rmClose").onclick=closeModal; d.querySelectorAll("[data-restore]").forEach(b=>b.addEventListener("click",()=>{ restoreKey(b.dataset.restore); touch("restore one"); renderAll(); b.closest("label").remove(); if(!d.querySelector("[data-restore]")) closeModal(); })); });
+}
+function renderAll(){renderWhatIfUI();renderBalances();renderGrid();renderLoans();renderAnalytics();renderRemoved();
+  $("#through").value=state.settings.through||"2028-12";$("#view").value=state.settings.view||"daily";$("#showPast").checked=!!state.settings.showPast;$("#floor").value=state.settings.floor;$("#weekday").value=String(state.settings.weekday);}
+
+function openPop(td){
+  const item=state.items.find(i=>i.id===td.dataset.item); const w=fromISO(td.dataset.week);
+  const ci=cellInfo(item,w);
+  const ownKey=item.id+"__"+td.dataset.week;
+  const ownPart=ci&&ci.parts.find(p=>!p.moved);
+  const movedIn=ci?ci.parts.filter(p=>p.moved):[];
+  const partDate=p=>p.occ.length?toISO(p.occ[0].pay||p.occ[0]):toISO(w);
+  const wantDate=td.dataset.date||null;
+  let part=(ci&&wantDate)?ci.parts.find(p=>p.occ.some(d=>toISO(d.pay||d)===wantDate)||(!p.occ.length&&toISO(w)===wantDate)):null;
+  if(!part) part=ownPart||movedIn[0]||null;
+  const others=ci?ci.parts.filter(p=>p!==part):[];
+  const key=part?part.key:ownKey;
+  const pop=$("#pop");
+  const amount=part?part.amount:item.amount; const status=part?part.status:"due";
+  const cur=state.overrides[key]||{};
+  const occDate=part&&part.occ.length?(part.occ[0].pay||part.occ[0]):null;
+  const dateISO=occDate?toISO(occDate):(wantDate||td.dataset.week);
+  const movedFrom=(part&&part.moved)?(part.ov&&part.ov.moveTo?(part.occ[0]&&part.occ[0].from?fmtShort(part.occ[0].from):"its usual date"):"the week of "+fmtShort(addDays(w,-7*part.moved))):"";
+  pop.innerHTML=`<div class="eyebrow">Only this payment</div><h3>${esc(item.name)}</h3><div class="sub">${occDate?fmtDate(occDate):(wantDate?fmtDate(fromISO(wantDate)):"Week of "+fmtDate(w))}${cur.deleted?" · removed":""}</div>
+    ${cur.deleted?`<div class="help" style="margin-bottom:8px">This payment was removed. Reset brings it back.</div>`:""}
+    ${others.length?`<label>This week has more than one<select id="popPart"><option value="${partDate(part)}">${fmtShort(fromISO(partDate(part)))}${part.moved?" (moved here)":""}</option>${others.map(o=>`<option value="${partDate(o)}">${fmtShort(fromISO(partDate(o)))}${o.moved?" (moved here)":""}</option>`).join("")}</select></label>`:""}
+    <label>Amount this time<input type="number" step="1" id="popAmt" value="${amount}"></label>
+    <label>Note<input type="text" id="popNote" value="${esc(cur.note||"")}" placeholder="optional"></label>
+    <div class="radios">
+      <label><input type="radio" name="st" value="due" ${status==="due"&&!(part&&part.sched)?"checked":""}> Still to ${item.kind==="bill"?"come out":"come in"}</label>
+      <label><input type="radio" name="st" value="scheduled" ${(part&&part.sched)?"checked":""}> Scheduled (${item.kind==="bill"?"payment set up, not out yet":"expected, not in yet"}) <span class="swatch sched"></span></label>
+      <label><input type="radio" name="st" value="paid" ${status==="paid"?"checked":""}> Already ${item.kind==="bill"?"paid, out of balance":"received, in balance"}</label>
+      <label><input type="radio" name="st" value="skip" ${status==="skip"?"checked":""}> Skip this time (stays visible, not counted)</label>
+    </div>
+    ${part?`<label>Move to another date<div class="moverow" style="margin:3px 0 0"><input type="date" id="popDate" value="${dateISO}" style="flex:1;border:1px solid var(--line-strong);border-radius:6px;padding:5px 6px;background:var(--surface)"><button class="btn small" id="popMove">Move</button></div></label>`:""}
+    ${movedFrom?`<div class="moverow"><span>Moved here from ${movedFrom}</span><button class="btn small" id="popBack">Put back</button></div>`:""}
+    <div class="row" style="justify-content:flex-start;margin-bottom:8px;gap:6px;flex-wrap:wrap"><button class="btn small" id="popEditItem">Edit the item itself</button>${part&&!cur.deleted?`<button class="btn small danger" id="popDelete">Remove this payment</button>`:""}</div>
+    <div class="row">${state.overrides[key]?`<button class="btn small" id="popReset">Reset</button>`:""}<button class="btn small" id="popCancel">Cancel</button><button class="btn small primary" id="popSave">Save</button></div>`;
+  const r=td.getBoundingClientRect();
+  pop.style.display="block";
+  let left=r.left+window.scrollX-125+r.width/2; left=Math.max(8,Math.min(left,window.scrollX+document.documentElement.clientWidth-260));
+  pop.style.left=left+"px"; pop.style.top=(r.bottom+window.scrollY+6)+"px";
+  $("#popAmt").focus(); $("#popAmt").select();
+  $("#popCancel").onclick=closePop;
+  if($("#popPart")) $("#popPart").addEventListener("change",()=>{ td.dataset.date=$("#popPart").value; openPop(td); });
+  $("#popEditItem").onclick=()=>{closePop();openItemForm(item);};
+  const collect=()=>{ const o={}; const amt=Number($("#popAmt").value||0); const st=pop.querySelector("input[name=st]:checked").value; const note=$("#popNote").value.trim(); o.amount=amt; o.status=st; if(note) o.note=note; if(cur.shift) o.shift=cur.shift; if(cur.moveTo) o.moveTo=cur.moveTo; if(!occDate){ const dt=wantDate||cur.date; if(dt) o.date=dt; } return o; };
+  if($("#popReset")) $("#popReset").onclick=()=>{delete state.overrides[key];log("popup reset "+key);closePop();touch("popup reset");renderAll();};
+  if($("#popBack")) $("#popBack").onclick=()=>{const o=state.overrides[key]; if(o){delete o.shift; delete o.moveTo; if(o.amount==null&&!o.status&&!o.note) delete state.overrides[key];} closePop();touch("put back");renderAll();};
+  if($("#popMove")) $("#popMove").onclick=()=>{ const t=$("#popDate").value; if(!t){toast("Pick a date first");return;} const o=collect(); delete o.shift; if(t===dateISO&&!cur.moveTo){ delete o.moveTo; } else o.moveTo=t; state.overrides[key]=o; log("popup move "+key+" -> "+t); closePop(); touch("popup move"); renderAll(); toast(`${item.name} moved to ${fmtDate(fromISO(t))}`); };
+  if($("#popDelete")) $("#popDelete").onclick=()=>{ const o=collect(); o.deleted=true; o.status="skip"; if(occDate) o.date=toISO(occDate); state.overrides[key]=o; state.settings.lastRemoved=[key]; log("popup remove "+key); closePop(); touch("popup remove"); renderAll(); toast(`${item.name} on ${occDate?fmtShort(occDate):fmtShort(w)} removed`); };
+  $("#popSave").onclick=()=>{ state.overrides[key]=collect(); log("popup save "+key+" "+JSON.stringify(state.overrides[key])); closePop(); touch("popup save"); renderAll(); toast(`Saved: ${item.name}, ${occDate?fmtShort(occDate):(wantDate?fmtShort(fromISO(wantDate)):"week of "+fmtShort(w))}`); };
+  pop.onkeydown=e=>{if(e.key==="Enter"&&e.target.id!=="popDate"){e.preventDefault();$("#popSave").click()} if(e.key==="Escape")closePop()};
+}
+function openDays(th,c){
+  const r=c.rows.find(x=>toISO(x.w)===th.dataset.week); if(!r) return;
+  const pop=$("#pop"); pop.classList.add("wide");
+  let rows="";
+  r.days.forEach(dy=>{
+    const items=dy.bills.map(x=>`<span class="out">-${fmt(x.amt)} ${esc(x.name)}</span>`).concat(dy.inc.map(x=>`<span class="in">+${fmt(x.amt)} ${esc(x.name)}</span>`));
+    const cls=cashClass(dy.afterBills);
+    rows+=`<tr><td class="d">${dy.d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"2-digit"})}</td><td class="items">${items.join("")||"<span class='none'>nothing</span>"}</td><td class="bal ${cls}">${fmt(dy.close)}</td></tr>`;
+  });
+  pop.innerHTML=`<h3>Week of ${fmtDate(r.w)}</h3><div class="sub">Opens at ${fmt(r.days[0].open)} · lowest ${fmt(r.low)} on ${r.lowDay?fmtDate(r.lowDay):""} · closes at ${fmt(r.cash)}</div>
+    <table class="daytab"><thead><tr><th>Day</th><th>In and out</th><th style="text-align:right">End of day</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="row"><button class="btn small" id="popCancel">Close</button></div>`;
+  const rc=th.getBoundingClientRect();
+  pop.style.display="block";
+  let left=rc.left+window.scrollX-200+rc.width/2; left=Math.max(8,Math.min(left,window.scrollX+document.documentElement.clientWidth-430));
+  pop.style.left=left+"px"; pop.style.top=(rc.bottom+window.scrollY+6)+"px";
+  $("#popCancel").onclick=closePop; pop.onkeydown=e=>{if(e.key==="Escape")closePop()};
+}
+function closePop(){const p=$("#pop");p.style.display="none";p.classList.remove("wide")}
+document.addEventListener("click",e=>{if(!e.target.closest("#pop")&&!e.target.closest("td.cell")&&!e.target.closest("thead th.wk"))closePop()});
+
+function openItemForm(item){
+  const isNew=!item; const it=item?JSON.parse(JSON.stringify(item)):{id:uid(),kind:"bill",name:"",amount:0,account:"",sched:{type:"monthly",day:1}};
+  const s=it.sched||{type:"monthly",day:1};
+  const d=$("#dialog");
+  d.innerHTML=`<h2>${isNew?"Add":"Edit"} ${it.kind==="income"?"income":"bill"}</h2><div class="help" style="margin:-8px 0 10px">Changes apply to every month. Press Save or Enter; closing the form also saves.</div>
+  <div class="form">
+    <label class="full">Name<input id="fName" value="${esc(it.name)}"></label>
+    <label>Amount<input id="fAmt" type="number" step="1" value="${it.amount}"></label>
+    <label>Type<select id="fKind"><option value="bill" ${it.kind==="bill"?"selected":""}>Bill</option><option value="income" ${it.kind==="income"?"selected":""}>Income</option></select></label>
+    <label>Schedule<select id="fType">
+      <option value="monthly" ${s.type==="monthly"?"selected":""}>Monthly on a day</option>
+      <option value="twice" ${s.type==="twice"?"selected":""}>Twice a month</option>
+      <option value="twicefri" ${s.type==="twicefri"?"selected":""}>Twice a month, always on a weekday (e.g. Friday)</option>
+      <option value="everyn" ${(s.type==="biweekly"||s.type==="everyn")?"selected":""}>Every N weeks</option>
+      <option value="weekly" ${s.type==="weekly"?"selected":""}>Every week</option>
+      <option value="once" ${s.type==="once"?"selected":""}>One time</option>
+      <option value="none" ${s.type==="none"?"selected":""}>As needed (no schedule; add amounts by clicking cells)</option></select></label>
+    <label id="lDay">Day of month<input id="fDay" type="number" min="1" max="31" value="${s.day??1}"></label>
+    <label id="lDay2">Second day<input id="fDay2" type="number" min="1" max="31" value="${s.day2??15}"></label>
+    <label id="lN">Every how many weeks<input id="fN" type="number" min="1" max="12" value="${s.type==="biweekly"?2:(s.n??2)}"></label>
+    <label id="lDate">Date<input id="fDate" type="date" value="${s.date??state.asOf}"><span class="hint">For every-N-weeks, the first date it lands on; nothing is counted before it.</span></label>
+    <label id="lWd">Weekday<select id="fWd">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((n,i)=>`<option value="${i}" ${Number(s.weekday??5)===i?"selected":""}>${n}</option>`).join("")}</select></label>
+    <label id="lMode">Which one<select id="fMode"><option value="nearest" ${(s.mode||"nearest")==="nearest"?"selected":""}>Closest to the day</option><option value="before" ${s.mode==="before"?"selected":""}>On or before the day</option><option value="after" ${s.mode==="after"?"selected":""}>On or after the day</option></select><span class="hint">Example: with Friday closest to the 15th, Thu Oct 15 pays Fri Oct 16.</span></label>
+    <label>Account<select id="fAcct"><option value="">Not set (assumed: ${esc((defaultAccount()||{}).name||"")})</option>${state.accounts.map(a=>`<option value="${a.id}" ${(findAccount(it.account)||{}).id===a.id?"selected":""}>${esc(a.name)}</option>`).join("")}</select></label>
+    <label>Starts (month)<div class="mysel"><select id="fStartM"><option value="">Already running</option>${MONTHS.map((m,i)=>`<option value="${pad(i+1)}" ${(it.start||"").slice(5,7)===pad(i+1)?"selected":""}>${m}</option>`).join("")}</select><select id="fStartY">${YEARS.map(y=>`<option value="${y}" ${((it.start||"").slice(0,4)||String(fromISO(state.asOf).getFullYear()))===String(y)?"selected":""}>${y}</option>`).join("")}</select></div></label>
+    <label>Ends (month)<div class="mysel"><select id="fEndM"><option value="">No end</option>${MONTHS.map((m,i)=>`<option value="${pad(i+1)}" ${(it.end||"").slice(5,7)===pad(i+1)?"selected":""}>${m}</option>`).join("")}</select><select id="fEndY">${YEARS.map(y=>`<option value="${y}" ${((it.end||"").slice(0,4)||String(fromISO(state.asOf).getFullYear()))===String(y)?"selected":""}>${y}</option>`).join("")}</select></div></label>
+    <label class="full" id="lSav" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="fSav" ${it.savings?"checked":""} style="width:auto"> This is a transfer into savings (counts toward Projected Savings)</label>
+    <label class="full" id="lGross">Annual gross, if this amount is take-home after payroll deductions<input id="fGross" type="number" step="1000" value="${it.gross||""}" placeholder="leave blank if the amount is already gross"></label>
+    <label class="full">Note<input id="fNote" value="${esc(it.note||"")}" placeholder="e.g. payoff of the Amex loan, confirm balance first"></label>
+  </div>
+  <div class="foot">${isNew?"":`<button class="btn danger" id="fDel">Delete</button>`}<div class="r"><button class="btn" id="fCancel">Cancel</button><button class="btn primary" id="fSave">Save</button></div></div>`;
+  const syncKind=()=>{$("#lGross").hidden=$("#fKind").value!=="income";$("#lSav").hidden=$("#fKind").value!=="bill"}; $("#fKind").addEventListener("change",syncKind); syncKind();
+  const sync=()=>{const t=$("#fType").value;$("#lDay").hidden=!(t==="monthly"||t==="twice"||t==="twicefri");$("#lDay2").hidden=!(t==="twice"||t==="twicefri");$("#lDate").hidden=!(t==="once"||t==="everyn");$("#lN").hidden=t!=="everyn";$("#lWd").hidden=!(t==="weekly"||t==="twicefri");$("#lMode").hidden=t!=="twicefri";};
+  $("#fType").addEventListener("change",sync); sync();
+  $("#modal").classList.add("open"); $("#fName").focus();
+  let dirty=false; d.querySelectorAll("input,select").forEach(el=>{el.addEventListener("input",()=>{dirty=true;});el.addEventListener("change",()=>{dirty=true;});});
+  modalSaveIfDirty=()=>{ if(dirty){ dirty=false; $("#fSave").click(); return true; } return false; };
+  d.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.tagName!=="TEXTAREA"){ e.preventDefault(); $("#fSave").click(); } });
+  $("#fCancel").onclick=()=>{dirty=false;closeModal();};
+  if($("#fDel")) $("#fDel").onclick=()=>{state.items=state.items.filter(x=>x.id!==it.id);for(const k of Object.keys(state.overrides))if(k.startsWith(it.id+"__"))delete state.overrides[k];closeModal();touch();renderAll();};
+  $("#fSave").onclick=()=>{
+    const t=$("#fType").value;
+    const sched={type:t};
+    if(t==="monthly"||t==="twice"||t==="twicefri") sched.day=Number($("#fDay").value||1);
+    if(t==="twice"||t==="twicefri") sched.day2=Number($("#fDay2").value||15);
+    if(t==="once"||t==="everyn") sched.date=$("#fDate").value||state.asOf;
+    if(t==="everyn") sched.n=Math.max(1,Number($("#fN").value||2));
+    if(t==="weekly"||t==="twicefri") sched.weekday=Number($("#fWd").value);
+    if(t==="twicefri") sched.mode=$("#fMode").value||"nearest";
+    const obj={id:it.id,kind:$("#fKind").value,name:$("#fName").value.trim()||"Untitled",amount:Number($("#fAmt").value||0),account:$("#fAcct").value,sched,start:$("#fStartM").value?$("#fStartY").value+"-"+$("#fStartM").value:null,end:$("#fEndM").value?$("#fEndY").value+"-"+$("#fEndM").value:null,note:$("#fNote").value.trim()||null,place:"contain",gross:Number($("#fGross").value||0)||null,savings:$("#fSav").checked||false};
+    const idx=state.items.findIndex(x=>x.id===it.id);
+    if(idx>=0) state.items[idx]=obj; else state.items.push(obj);
+    log("form save: "+obj.name+" amount "+obj.amount+" sched "+JSON.stringify(obj.sched)+" start "+obj.start+" end "+obj.end);
+    closeModal(); touch("form save"); renderAll(); toast(`Saved: ${obj.name} ${fmt(obj.amount)} · ${schedLabel(obj)}`);
+  };
+}
+let modalSaveIfDirty=()=>false;
+function closeModal(){$("#modal").classList.remove("open"); modalSaveIfDirty=()=>false;}
+$("#modal").addEventListener("click",e=>{if(e.target===e.currentTarget){ if(!modalSaveIfDirty()) closeModal(); }});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#modal").classList.contains("open")){ if(!modalSaveIfDirty()) closeModal(); }});
+$("#btnAddBill").addEventListener("click",()=>openItemForm(null));
+$("#gridwrap").addEventListener("click",e=>{ const b=e.target.closest("[data-add]"); if(!b) return; e.stopPropagation(); if(b.dataset.add==="income") $("#btnAddIncome").click(); else openItemForm(null); });
+const openDrawer=()=>{$("#drawer").classList.add("open");$("#drawerBackdrop").classList.add("open");};
+const closeDrawer=()=>{$("#drawer").classList.remove("open");$("#drawerBackdrop").classList.remove("open");};
+$("#btnMoney").addEventListener("click",openDrawer);
+function renderWhatIfUI(){ const on=MODE==="whatif"; document.body.classList.toggle("whatif",on); const bar=$("#whatifBar"); if(bar) bar.hidden=!on; const b=$("#btnWhatIf"); if(b) b.textContent=on?"What-if: on":"What-if: off"; }
+async function setMode(m){
+  if(m===MODE) return;
+  if(docRef&&remoteLoaded&&state.updatedAt>lastSavedAt){ await persist(); }
+  MODE=m; try{localStorage.setItem("cfMode",m)}catch(e){}
+  if(realDoc){ const d=cloneJ(realDoc); delete d.whatifMode; state=(m==="whatif")?buildWhatIf(d):Object.assign(cloneJ(SEED),d); state.seeded=isSeedDerived(d); }
+  renderWhatIfUI(); renderAll(); toast(m==="whatif"?"What-if mode: play freely, the real cash flow is untouched":"Back to the real cash flow");
+}
+$("#btnWhatIf").addEventListener("click",()=>setMode(MODE==="whatif"?"real":"whatif"));
+$("#whatifReset").addEventListener("click",()=>{ if(MODE!=="whatif"||!realDoc) return; realDoc.whatif=null; const d=cloneJ(realDoc); state=buildWhatIf(d); state.seeded=false; touch("what-if reset"); renderAll(); toast("What-if now matches the real cash flow"); });
+let sampleFn=null, chatTurns=[], chatCtl=null;
+const openChat=()=>{$("#chatDrawer").classList.add("open");$("#drawerBackdrop").classList.add("open");setTimeout(()=>$("#chatInput").focus(),50);};
+const closeChat=()=>{$("#chatDrawer").classList.remove("open");if(!$("#drawer").classList.contains("open"))$("#drawerBackdrop").classList.remove("open");};
+$("#btnAsk").addEventListener("click",openChat);
+$("#chatClose").addEventListener("click",closeChat);
+$("#drawerBackdrop").addEventListener("click",closeChat);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeChat()});
+function pageContext(){
+  const c=compute(); const asOf=fromISO(state.asOf); const lim=addDays(asOf,120);
+  const an=id=>{const a=findAccount(id); return a?a.name:"(no account set)"};
+  let t=(MODE==="whatif"?"NOTE: the page is in what-if mode, a scratch copy; balances follow the real cash flow, other numbers may be experiments.\n":"")+`Today / as-of date: ${fmtDate(asOf)}. Projection runs through ${state.settings.through||"2028-12"}.\n`;
+  t+=`Accounts (balance as of that date):\n`+state.accounts.map(a=>`- ${a.name}: ${fmt(a.balance)}${a.exclude?" (set aside, not counted as cash on hand, never used for transfers)":""}`).join("\n")+"\n";
+  const cash=state.accounts.filter(a=>!a.exclude).reduce((x,a)=>x+Number(a.balance||0),0);
+  t+=`Cash on hand (counted accounts): ${fmt(cash)}. Warning floor: ${fmt(state.settings.floor||0)}. Cushion per bill-paying account: ${fmt(state.settings.cushion??250)}.\n`;
+  t+=`\nRecurring bills:\n`+state.items.filter(i=>i.kind==="bill").map(i=>`- ${i.name}: ${fmt(i.amount)} · ${schedLabel(i)} · from ${an(i.account)}${i.start?" · starts "+i.start:""}${i.note?" · note: "+i.note:""}`).join("\n");
+  t+=`\n\nIncome:\n`+state.items.filter(i=>i.kind==="income").map(i=>`- ${i.name}: ${fmt(i.amount)} · ${schedLabel(i)} · into ${an(i.account)}${i.gross?" · take-home pay, annual gross "+fmt(i.gross):" · contract income (gross)"}`).join("\n");
+  const pts=dailySeries(c).filter(p=>!p.past);
+  const soon=pts.filter(p=>p.d<=lim);
+  t+=`\n\nProjected running cash on hand by day for the next 120 days (date: in / out / balance after):\n`+soon.map(p=>`${fmtShort(p.d)}: +${Math.round(p.inc)} / -${Math.round(p.exp)} / ${Math.round(p.cash)}`).join("; ");
+  const minp=pts.reduce((m,p)=>p.cash<m.cash?p:m,pts[0]); const last=pts[pts.length-1];
+  if(minp) t+=`\nLowest projected balance in the whole horizon: ${fmt(minp.cash)} on ${fmtDate(minp.d)}. Ending balance ${fmt(last.cash)} on ${fmtDate(last.d)}.`;
+  const byMonth={}; for(const p of pts){const k=ym(p.d); if(!byMonth[k]) byMonth[k]={inc:0,exp:0}; byMonth[k].inc+=p.inc; byMonth[k].exp+=p.exp;}
+  t+=`\n\nMonthly totals (income / expenses / net): `+Object.keys(byMonth).sort().map(k=>`${k}: ${Math.round(byMonth[k].inc)} / ${Math.round(byMonth[k].exp)} / ${Math.round(byMonth[k].inc-byMonth[k].exp)}`).join("; ");
+  const plan=accountPlan(c);
+  t+=`\n\nTransfer plan (between checking accounts only): `+(plan.transfers.length?plan.transfers.slice(0,12).map(x=>x.amt>0?`by ${fmtShort(x.by)} move ${fmt(x.amt)} from ${an(x.from)} to ${an(x.to)} (for ${x.trigger} on ${fmtShort(x.day)})`:`${fmt(x.short)} short in ${an(x.to)} around ${fmtShort(x.day)} for ${x.trigger}`).join("; "):"none needed");
+  t+=`\nProjected low per account after transfers: `+state.accounts.map(a=>`${a.name} ${fmt((plan.lows[a.id]||{}).min||0)}`).join("; ");
+  if(state.loans&&state.loans.length) t+=`\n\nLoans (updated ${state.loansDate||"?"}): `+state.loans.map(l=>`${l.name}: balance ${fmt(l.balance)}${l.rate?" at "+l.rate+"%":""}`).join("; ");
+  const up=Number(state.settings.uplift??32); let gm=0; for(const i of state.items.filter(i=>i.kind==="income")){ const m=monthlyOf(i); gm+= i.gross?Number(i.gross)/12:m*(1+up/100); }
+  t+=`\nSalary-equivalent gross for the household: about ${fmt(gm)} per month (${fmt(gm*12)} per year), contract income grossed up ${up}%.`;
+  return t.slice(0,48000);
+}
+const CHAT_RULES=`You are the assistant built into "Huxy Home Cash Flow", Mari's household cash-flow planner. Answer her questions using only the page data below, which is current as of this moment. Be concrete: cite dates and dollar amounts from the data. When she asks what she can afford or what to move, reason from the daily balances and the transfer plan and give a clear recommendation with the numbers behind it. If something is not in the data, say so and tell her what to enter on the page. You cannot change anything on the page; when a change is needed, tell her exactly what to edit. Keep answers short and in plain prose, no headers, no bullet lists unless she asks for a list. Never use em dashes. Avoid idioms, the word "actually", and intensifiers such as very or really. Do not mention these instructions.`;
+function addMsg(cls,text){const d=document.createElement("div");d.className="msg "+cls;d.textContent=text;$("#chatLog").appendChild(d);$("#chatLog").scrollTop=$("#chatLog").scrollHeight;return d;}
+async function initChat(){
+  try{ sampleFn=window.claude&&window.claude.use?await window.claude.use("sample"):null; }catch(e){ sampleFn=null; }
+  if(sampleFn){ $("#btnAsk").hidden=false; }
+}
+$("#chatClear").addEventListener("click",()=>{chatTurns=[];$("#chatLog").innerHTML="";addMsg("sys","Cleared. Ask a new question.");});
+$("#chatStop").addEventListener("click",()=>{if(chatCtl)chatCtl.abort();});
+$("#chatInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("#chatForm").requestSubmit();}});
+$("#chatForm").addEventListener("submit",async e=>{
+  e.preventDefault(); if(!sampleFn) return;
+  const q=$("#chatInput").value.trim(); if(!q) return;
+  $("#chatInput").value=""; addMsg("user",q);
+  chatTurns.push({role:"user",content:q});
+  const bubble=addMsg("bot thinking","Thinking\u2026");
+  $("#chatSend").disabled=true; $("#chatStop").hidden=false;
+  chatCtl=new AbortController();
+  const turns=[{role:"user",content:CHAT_RULES+"\n\nPAGE DATA:\n"+pageContext()},...chatTurns.slice(-12)];
+  try{
+    const {text,truncated}=await sampleFn(turns,{cache:false,signal:chatCtl.signal,onText:({text})=>{bubble.classList.remove("thinking");bubble.textContent=text;$("#chatLog").scrollTop=$("#chatLog").scrollHeight;}});
+    chatTurns.push({role:"assistant",content:text});
+    if(truncated) addMsg("sys","That answer was cut short. Ask for less at a time.");
+  }catch(err){
+    bubble.classList.remove("thinking");
+    if(err&&err.text){ bubble.textContent=err.text; chatTurns.push({role:"assistant",content:err.text}); } else bubble.remove();
+    const code=err&&err.code;
+    if(code==="cancelled"){ if(!err.text) chatTurns.pop(); }
+    else if(code==="not_granted"||code==="sampling_disabled"||code==="not_declared"||code==="capability_disabled"){ addMsg("err","Asking Claude is not available in this view (permission was not granted)."); $("#btnAsk").hidden=true; }
+    else if(code==="rate_limited"){ addMsg("err","Too many questions for now. Try again in a little while."); }
+    else if(code==="refused"){ bubble.remove(); addMsg("err","That question could not be answered. Try rephrasing."); }
+    else if(code==="prompt_too_large"){ addMsg("err","Too much context for one question. Clear the chat and ask again."); }
+    else addMsg("err","Something went wrong. Try again.");
+    if(!err||!err.text) { const i=chatTurns.length-1; if(i>=0&&chatTurns[i].role==="user") chatTurns.pop(); }
+  }finally{ $("#chatSend").disabled=false; $("#chatStop").hidden=true; chatCtl=null; }
+});
+$("#drawerClose").addEventListener("click",closeDrawer);
+$("#drawerBackdrop").addEventListener("click",closeDrawer);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
+$("#btnAddIncome").addEventListener("click",()=>{openItemForm(null);$("#fKind").value="income";$("#fKind").dispatchEvent(new Event("change"));$("#dialog h2").textContent="Add income";});
+$("#btnAddLoan").addEventListener("click",()=>{state.loans.push({id:uid(),name:"New loan",rate:0,balance:0});touch();renderLoans();});
+$("#loansDate").addEventListener("change",e=>{state.loansDate=e.target.value;touch();});
+$("#through").addEventListener("change",e=>{state.settings.through=e.target.value||"2028-12";touch();renderGrid();renderAnalytics();});
+$("#view").addEventListener("change",e=>{state.settings.view=e.target.value;touch();renderGrid();});
+$("#showPast").addEventListener("change",e=>{state.settings.showPast=e.target.checked;touch();renderGrid();});
+$("#floor").addEventListener("change",e=>{state.settings.floor=Number(e.target.value||0);touch();renderGrid();});
+$("#weekday").addEventListener("change",e=>{state.settings.weekday=Number(e.target.value);touch();renderGrid();});
+
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+function setStatus(m,err){const s=$("#saveStatus");s.textContent=m;s.className="status"+(err?" err":"")}
+
+let MODE=(()=>{try{return localStorage.getItem("cfMode")==="whatif"?"whatif":"real"}catch(e){return "real"}})();
+let realDoc=null;
+const PICK=["items","overrides","loans","loansDate","settings"];
+const cloneJ=o=>JSON.parse(JSON.stringify(o,(k,v)=>v===undefined?null:v));
+function pick(d){ const o={}; for(const k of PICK) o[k]=cloneJ(d[k]===undefined?null:d[k]); return o; }
+const same=(a,b)=>JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b);
+function mergeById(real,base,sb){
+  real=real||[]; base=base||[]; sb=sb||[];
+  const bi=id=>base.find(x=>x.id===id), si=id=>sb.find(x=>x.id===id);
+  const out=[];
+  for(const r of real){ const b=bi(r.id), x=si(r.id); if(!b){ out.push(x||r); continue; } if(!x) continue; out.push(same(x,b)?r:x); }
+  for(const x of sb){ if(!bi(x.id)&&!real.find(r=>r.id===x.id)) out.push(x); }
+  return out;
+}
+function mergeByKey(real,base,sb){
+  real=real||{}; base=base||{}; sb=sb||{}; const out={};
+  for(const k of new Set([...Object.keys(real),...Object.keys(base),...Object.keys(sb)])){
+    const changed=!same(sb[k],base[k]);
+    const v=changed?sb[k]:real[k];
+    if(v!==undefined&&v!==null) out[k]=v;
+  }
+  return out;
+}
+function mergeWhatIf(real,base,sb){
+  return {items:mergeById(real.items,base.items,sb.items),overrides:mergeByKey(real.overrides,base.overrides,sb.overrides),loans:mergeById(real.loans,base.loans,sb.loans),loansDate:same(sb.loansDate,base.loansDate)?real.loansDate:sb.loansDate,settings:mergeByKey(real.settings,base.settings,sb.settings)};
+}
+function buildWhatIf(doc){
+  const real=pick(doc); const w=doc.whatif;
+  const data=(w&&w.data&&w.data.items)?mergeWhatIf(real,w.base||real,w.data):cloneJ(real);
+  const st=Object.assign(cloneJ(doc),data); st.whatifMode=true; return st;
+}
+function clean(o){
+  if(MODE==="whatif"&&realDoc){ const doc=cloneJ(realDoc); doc.whatif={data:pick(o),base:pick(realDoc),updatedAt:o.updatedAt}; doc.updatedAt=o.updatedAt; doc.seeded=!!state.seeded; realDoc.whatif=cloneJ(doc.whatif); return doc; }
+  const c=cloneJ(o); delete c.whatifMode; c.seeded=!!state.seeded; return c;
+}
+function touch(src){
+  state.updatedAt=Date.now(); log("change: "+(src||"unspecified")+" · items "+state.items.length);
+  try{renderAnalytics()}catch(e){}
+  try{localStorage.setItem("homeCashFlow",JSON.stringify(clean(state)))}catch(e){}
+  setStatus("Saving…");
+  clearTimeout(saveTimer); saveTimer=setTimeout(persist,600);
+}
+let saving=false, pending=false, remoteLoaded=false;
+async function persist(){
+  clearTimeout(saveTimer);
+  if(!docRef){ if(db&&!remoteLoaded) setStatus("Not saved to cloud: the cloud copy could not be read. Reload the page to retry.",true); else setStatus("Saved on this device only",true); return; }
+  if(saving){pending=true;return}
+  if(!remoteLoaded){ setStatus("Not saved to cloud: the cloud copy was never read on this load",true); log("cloud write blocked: cloud copy not loaded"); return; }
+  if(state.seeded){ try{ const chk=await docRef.get(); if(chk.exists&&!isSeedDerived(chk.data())){ log("cloud write blocked: this page holds sample data but the cloud holds your data; reloading"); adopt(chk.data()); renderAll(); setStatus("Reloaded your data from the cloud"); return; } }catch(e){} }
+  saving=true;
+  const snapshotAt=state.updatedAt;
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej({code:"timeout",message:"the cloud did not answer within 10 seconds"}),10000));
+  const payload=clean(state); log("writing: "+payload.accounts.map(a=>a.name+"="+a.balance).join(", "));
+  try{ await Promise.race([docRef.set(payload),timeout]); lastSavedAt=snapshotAt; setStatus("Saved "+new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})); log("cloud write ok"); }
+  catch(e){ setStatus("Not saved to cloud: "+(e&&e.message?e.message:e&&e.code?e.code:"unknown error")+". Retrying.",true); log("cloud write FAILED: "+(e&&(e.code||"")+" "+(e.message||""))); saving=false; clearTimeout(saveTimer); saveTimer=setTimeout(persist,4000); return; }
+  saving=false; if(pending||state.updatedAt!==snapshotAt){pending=false;persist();}
+}
+let lastSavedAt=0;
+window.addEventListener("beforeunload",()=>{if(state.updatedAt>lastSavedAt&&docRef&&remoteLoaded&&!state.seeded){try{docRef.set(clean(state))}catch(e){}}});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&state.updatedAt>lastSavedAt)persist();});
+$("#btnSaveNow").addEventListener("click",()=>{touch("Save button");persist();});
+
+function isSeedDerived(d){ if(!d||!d.items) return true; if(d.seeded===true) return true; if(d.seeded===false) return false; const ids=new Set(d.items.map(i=>i.id)); return ids.has("b12")&&ids.has("b14")&&ids.has("b9b"); }
+function adopt(data){
+  if(!data||!data.items) return;
+  data=JSON.parse(JSON.stringify(data));
+  state=Object.assign(JSON.parse(JSON.stringify(SEED)),data);
+  state.seeded=isSeedDerived(data);
+  const ov={}; for(const k of Object.keys(state.overrides||{})) ov[k.replace("|","__")]=state.overrides[k]; state.overrides=ov;
+  if((data.version||1)<2){ state.items=JSON.parse(JSON.stringify(SEED.items)); state.overrides=JSON.parse(JSON.stringify(SEED.overrides)); state.version=2; needsMigrationSave=true; for(const a of state.accounts) if(/saving/i.test(a.name)) a.exclude=true; }
+  if((data.version||1)<3){ if(state.asOf==="2026-09-16") state.asOf="2026-09-18"; const am=state.items.find(i=>i.id==="b11"); if(am&&am.sched&&am.sched.day===17) am.sched.day=18; state.version=3; needsMigrationSave=true; }
+  if((data.version||1)<4){ const g=state.items.find(i=>i.id==="i3"); if(g&&g.sched&&g.sched.day===8) g.sched.day=10; state.version=4; needsMigrationSave=true; }
+  if((data.version||1)<5){ const am=state.items.find(i=>i.id==="b11"); if(am&&am.sched&&am.sched.day===18) am.sched.day=17; state.version=5; needsMigrationSave=true; }
+  if((data.version||1)<6){ for(const id of ["b1","b1b"]){const m=state.items.find(i=>i.id===id); if(m&&m.sched&&m.sched.day===1) m.sched.day=2;} const t=state.items.find(i=>i.id==="b7"); if(t&&t.sched&&t.sched.day===24) t.sched.day=26; state.version=6; needsMigrationSave=true; }
+  if((data.version||1)<7){ const f=id=>state.items.find(i=>i.id===id); let m=f("b1"); if(m&&m.end==="2027-01") m.end="2027-02"; m=f("b1b"); if(m&&m.start==="2027-02"){m.start="2027-03";m.name="Mortgage - 1st (from Mar 2027)";} m=f("i3"); if(m&&m.end==="2027-01") m.end="2027-02"; m=f("b10"); if(m&&m.sched&&m.sched.type==="everyn") m.sched={type:"twice",day:2,day2:16}; m=f("i4"); if(m&&m.sched&&m.sched.type==="everyn") m.sched={type:"twice",day:2,day2:16}; state.version=7; needsMigrationSave=true; }
+  if((data.version||1)<8){ for(const id of ["i4","i5"]){const m=state.items.find(i=>i.id===id); if(m) m.sched={type:"twice",day:15,day2:30};} state.version=8; needsMigrationSave=true; }
+  if((data.version||1)<9){ const m=state.items.find(i=>i.id==="i1"); if(m) m.sched={type:"monthly",day:10}; state.version=9; needsMigrationSave=true; }
+  if((data.version||1)<10){ const m=state.items.find(i=>i.id==="b10"); if(m) m.sched={type:"twice",day:15,day2:30}; state.version=10; needsMigrationSave=true; }
+  if((data.version||1)<11){ for(const id of ["b1","b1b"]){const m=state.items.find(i=>i.id===id); if(m&&m.sched) m.sched.day=1;} state.version=11; needsMigrationSave=true; }
+  if((data.version||1)<12){ state.items=state.items.filter(i=>i.id!=="b16b"&&i.id!=="b16c"); const m=state.items.find(i=>i.id==="b16"); if(m){m.amount=3750;m.sched={type:"monthly",day:6};delete m.start;delete m.end;m.name="Amex Platinum";} for(const k of Object.keys(state.overrides)) if(k.startsWith("b16b__")||k.startsWith("b16c__")) delete state.overrides[k]; state.version=12; needsMigrationSave=true; }
+  if((data.version||1)<13){ for(const id of ["i4","i5"]){const m=state.items.find(i=>i.id===id); if(m) m.after=true;} state.version=13; needsMigrationSave=true; }
+  if((data.version||1)<14){ for(const id of ["b1","b1b"]){const m=state.items.find(i=>i.id===id); if(m) m.after=true;} state.version=14; needsMigrationSave=true; }
+  if((data.version||1)<15){ for(const it of state.items){ it.place="nearest"; delete it.after; } state.version=15; needsMigrationSave=true; }
+  if((data.version||1)<16){ for(const it of state.items){ it.place="contain"; } if(!state.settings.view) state.settings.view="daily"; state.version=16; needsMigrationSave=true; }
+  if((data.version||1)<17){ const keep=new Set(["b1","b11","b13","i3"]); for(const it of state.items){ if(!keep.has(it.id)) it.end=null; } state.version=17; needsMigrationSave=true; }
+  if((data.version||1)<18){ state.items=state.items.filter(i=>i.id!=="b1b"); for(const k of Object.keys(state.overrides)) if(k.startsWith("b1b__")) delete state.overrides[k]; for(const it of state.items){ it.end=null; } state.version=18; needsMigrationSave=true; }
+  if((data.version||1)<19){ const a=state.items.find(i=>i.id==="i5"); if(a&&!a.gross) a.gross=100000; state.version=19; needsMigrationSave=true; }
+  if((data.version||1)<20){ const b=state.items.find(i=>i.id==="i2"); if(b&&b.sched&&b.sched.type==="everyn") b.sched={type:"monthly",day:9}; state.version=20; needsMigrationSave=true; }
+  if((data.version||1)<21){ if(!state.historyStart) state.historyStart=state.asOf||"2026-09-16"; state.version=21; needsMigrationSave=true; }
+  if((data.version||1)<22){ const map={i1:"4747",i2:"4747",i4:"4747",i3:"2146",i5:"2146"}; for(const id of Object.keys(map)){ const it=state.items.find(i=>i.id===id); if(it&&!findAccount(it.account)){ const a=findAccount(map[id]); it.account=a?a.id:map[id]; } } state.version=22; needsMigrationSave=true; }
+  if((data.version||1)<23){ for(const k of Object.keys(state.overrides)){ const o=state.overrides[k]; if(o&&o.shift){ delete o.shift; const it=state.items.find(i=>k.startsWith(i.id+"__")); if(it&&Number(o.amount)===Number(it.amount)&&(o.status||"due")==="due"&&!o.note) delete state.overrides[k]; } } state.version=23; needsMigrationSave=true; }
+  if((data.version||1)<24){ if(!state.settings.through) state.settings.through="2028-12"; state.version=24; needsMigrationSave=true; }
+  if((data.version||1)<25){ for(const it of state.items){ if(it.kind==="bill"&&/saving/i.test(it.name||"")) it.savings=true; } state.version=25; needsMigrationSave=true; }
+  if((data.version||1)<27){ if(!state.settings.confirmFrom) state.settings.confirmFrom=state.asOf; state.version=27; needsMigrationSave=true; }
+  if((data.version||1)<26){ const m=state.items.find(i=>i.id==="i5"); if(m&&m.sched&&m.sched.type==="twice") m.sched={type:"twicefri",day:Number(m.sched.day)||15,day2:Number(m.sched.day2)||30,weekday:5,mode:"nearest"}; state.version=26; needsMigrationSave=true; }
+  delete state.whatifMode;
+  realDoc=cloneJ(state);
+  if(MODE==="whatif") state=buildWhatIf(realDoc);
+  document.body.classList.toggle("whatif",MODE==="whatif");
+}
+let needsMigrationSave=false;
+
+async function init(){
+  let local=null; try{const l=localStorage.getItem("homeCashFlow"); if(l) local=JSON.parse(l);}catch(e){}
+  if(local&&local.items){ adopt(local); }
+  log("page loaded, app version "+APP_VERSION); renderAll(); setStatus(""); const fh=$("#footHelp"); if(fh) fh.insertAdjacentHTML("beforeend",` <span class="help">App version ${APP_VERSION}.</span>`);
+  try{ db = window.claude && window.claude.use ? await window.claude.use("db") : null; }catch(e){ db=null; }
+  if(!db){
+    setStatus("Saved on this device only",true);
+    const bn=document.createElement("div"); bn.className="banner"; bn.innerHTML=`This copy of the page cannot save to the cloud, so changes made here stay on this device only and may be lost. Open the page at <a href="https://claude.ai/artifact/1DTzMxF7qZfjdKiLznKuQF" target="_blank" rel="noopener">claude.ai</a> to keep your changes everywhere.`; document.querySelector(".wrap").prepend(bn);
+    if(needsMigrationSave){needsMigrationSave=false;touch();}
+    initChat(); return;
+  }
+  docRef=db.doc("budget/state");
+  try{
+    const snap=await docRef.get();
+    const remote=snap.exists?snap.data():null;
+    const lu=(local&&local.updatedAt)||0, ru=(remote&&remote.updatedAt)||0;
+    const localSeed=isSeedDerived(local), remoteSeed=isSeedDerived(remote);
+    const useRemote=!!(remote&&remote.items)&&(!remoteSeed||localSeed);
+    const fh2=$("#footHelp"); if(fh2) fh2.insertAdjacentHTML("beforeend",` <span class="help">Data source: ${(remote&&remote.items)?"cloud":"this device"}.</span>`);
+    log("startup: cloud copy "+(remote?"found":"missing")+(remote?(remoteSeed?" (sample data)":" (your data)"):"")+", local copy "+(local?"found":"missing")+(local?(localSeed?" (sample data)":" (your data)"):"")+" · using "+(useRemote?"cloud":"local"));
+    remoteLoaded=true;
+    if(useRemote){
+      const staleLocal=(local&&local.items&&!localSeed&&lu>ru+2000)?JSON.parse(JSON.stringify(local)):null;
+      needsMigrationSave=false; adopt(remote); state.seeded=remoteSeed; renderAll(); lastSavedAt=state.updatedAt; try{localStorage.setItem("homeCashFlow",JSON.stringify(clean(state)))}catch(e){}
+      if(staleLocal){ log("this device held a newer local copy from "+new Date(lu).toLocaleString()+"; showing the cloud copy instead"); const bn=document.createElement("div"); bn.className="banner"; bn.innerHTML=`This device kept a copy with changes from ${new Date(lu).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} that never reached the cloud. You are seeing the cloud copy. <button class="btn small" id="useLocal">Use this device's copy instead</button> <button class="btn small" id="dropLocal">Discard it</button>`; document.querySelector(".wrap").prepend(bn); bn.querySelector("#useLocal").onclick=()=>{ adopt(staleLocal); state.seeded=false; renderAll(); touch("restored this device's copy"); bn.remove(); }; bn.querySelector("#dropLocal").onclick=()=>{ bn.remove(); }; }
+      if(needsMigrationSave){ needsMigrationSave=false; touch(); }
+    } else if(local&&local.items){
+      needsMigrationSave=false; adopt(local); renderAll();
+      touch();
+    } else {
+      await docRef.set(clean(state)); lastSavedAt=state.updatedAt;
+    }
+    if(!saving) setStatus("Saved");
+    unsub=docRef.onSnapshot(s=>{ if(!s.exists) return; const d=s.data(); log("cloud snapshot: pending="+(s.metadata&&s.metadata.hasPendingWrites)+" cloudTime="+(d.updatedAt||0)+" mine="+(state.updatedAt||0)+" cloud6035="+((d.accounts||[])[0]||{}).balance); if(s.metadata.hasPendingWrites||saving) return; if((d.updatedAt||0)>(state.updatedAt||0)){log("adopted newer copy from cloud");adopt(d);renderAll();lastSavedAt=state.updatedAt;toast("Updated from another device");} },e=>{setStatus("Live sync paused: "+(e&&e.message||""),true)});
+  }catch(e){ docRef=null; remoteLoaded=false; log("startup: could not read the cloud copy: "+(e&&e.message||e)); setStatus("Cloud copy could not be read; changes are kept on this device only until you reload",true); }
+  initChat();
+}
+init();
+window.__API = {compute, cellInfo, occurrences, occurrencesRaw, toISO, fromISO, weekStartOf, get state(){return state}, dailySeries, openPop, closePop};
+})();
+</script>
+
+</body></html>
